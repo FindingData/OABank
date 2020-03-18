@@ -9,11 +9,8 @@ import com.google.gson.Gson;
 import org.xutils.common.Callback;
 import org.xutils.common.util.LogUtil;
 import org.xutils.http.RequestParams;
-import org.xutils.http.cookie.DbCookieStore;
 import org.xutils.x;
 
-import java.net.HttpCookie;
-import java.util.List;
 import java.util.Map;
 
 import static com.findingdata.oabank.base.Config.BASE_URL;
@@ -38,6 +35,7 @@ public class XHttp {
         sbCookie.append(Config.COOKIE_NAME).append("=")
                 .append(TokenUtils.getToken());
         params.addHeader("Cookie",sbCookie.toString());
+        params.setUseCookie(false);
         LogUtils.d("Cookie",sbCookie);
         if(null!=map){
             for(Map.Entry<String, String> entry : map.entrySet()){
@@ -63,6 +61,7 @@ public class XHttp {
             sbCookie.append(Config.COOKIE_NAME).append("=")
                     .append(TokenUtils.getToken());
             params.addHeader("Cookie",sbCookie.toString());
+            params.setUseCookie(false);
             LogUtils.d("Cookie",sbCookie);
         }
         if (null != map) {
@@ -89,6 +88,7 @@ public class XHttp {
             sbCookie.append(Config.COOKIE_NAME).append("=")
                     .append(TokenUtils.getToken());
             params.addHeader("Cookie",sbCookie.toString());
+            params.setUseCookie(false);
             LogUtils.d("Cookie",sbCookie);
         }
         if (null != object) {

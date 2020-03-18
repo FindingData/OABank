@@ -78,7 +78,7 @@ public class AddProjectActivity extends BaseActivity {
                     if (jsonObject.getBoolean("Status")){
                         JSONArray dataArray = jsonObject.getJSONArray("Result");
                         formid = dataArray.getJSONObject(0).getString("value");
-                        //getDynamicFormLabels(formid);
+                        getDynamicFormLabels(formid);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
