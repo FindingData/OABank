@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--IconImageView-->
+    <declare-styleable name="IconImageView">
+        <!--图标的资源-->
+        <attr name="iiv_icon" format="reference" />
+        <!--图标缩放的比例, 默认是0.5-->
+        <attr name="iiv_icon_scale" format="float" />
+        <!--图标是否显示, 默认是true-->
+        <attr name="iiv_is_show" format="boolean" />
+    </declare-styleable>
+    <attr name="RadiusImageViewStyle" format="reference" />
+    <declare-styleable name="RadiusImageView">
+        <!--边框宽度，默认：0-->
+        <attr name="riv_border_width" format="dimension" />
+        <!--边框的颜色，默认：Color.GRAY-->
+        <attr name="riv_border_color" format="color" />
+        <!--选中时，覆盖在图片上的图层颜色，默认：Color.TRANSPARENT-->
+        <attr name="riv_selected_mask_color" format="color" />
+        <!--边框选中时的颜色，默认：Color.GRAY-->
+        <attr name="riv_selected_border_color" format="color" />
+        <!--边框选中时的宽度，默认：0-->
+        <attr name="riv_selected_border_width" format="dimension" />
+        <!--圆角的大小，默认0-->
+        <attr name="riv_corner_radius" format="dimension" />
+        <!--是否是椭圆形，默认：false-->
+        <attr name="riv_is_oval" format="boolean" />
+        <!--图片是否是圆形的，默认：false-->
+        <attr name="riv_is_circle" format="boolean" />
+        <!--图片是否可触摸选中，默认：true-->
+        <attr name="riv_is_touch_select_mode_enabled" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="BezierBannerView">
+        <attr name="bbv_selectedColor" format="color" />
+        <attr name="bbv_unSelectedColor" format="color" />
+        <attr name="bbv_selectedRadius" format="dimension" />
+        <attr name="bbv_unSelectedRadius" format="dimension" />
+        <attr name="bbv_spacing" format="dimension" />
+    </declare-styleable>
+</resources>
