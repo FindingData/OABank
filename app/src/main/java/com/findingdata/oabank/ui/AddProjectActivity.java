@@ -25,6 +25,7 @@ import java.util.Map;
 
 import androidx.annotation.Nullable;
 
+import static com.findingdata.oabank.base.Config.BASE_URL;
 import static com.findingdata.oabank.base.Config.OA_BASE_URL;
 
 /**
@@ -42,12 +43,20 @@ public class AddProjectActivity extends BaseActivity {
     private String formid;
     private JSONArray formContentValue;
     private JSONArray formContents;
+    private String project_id;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         toolbar_title.setText("新增项目");
         formContentValue = new JSONArray();
         getFormList();
+    }
+
+    @Override
+    protected  void onStart(){
+        super.onStart();
+        getProperty();
     }
 
     @Event({R.id.toolbar_btn_back})
@@ -57,6 +66,48 @@ public class AddProjectActivity extends BaseActivity {
                 finish();
                 break;
         }
+    }
+
+    private void getProperty(){
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(BASE_URL+"/api/Property/GetPropertyListByProjectId");
+        requestParam.setMethod(HttpMethod.Get);
+        Map<String,Object> requestMap=new HashMap<>();
+        requestMap.put("project_id",project_id);
+        requestParam.setGetRequestMap(requestMap);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                try {
+                    JSONObject jsonObject=new JSONObject(result);
+                    if (jsonObject.getBoolean("Status")){
+                        JSONArray dataArray = jsonObject.getJSONArray("Result");
+                        initPropertyList(dataArray);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    private void initPropertyList(JSONArray array){
+
     }
 
     private void getFormList(){
@@ -163,7 +214,9 @@ public class AddProjectActivity extends BaseActivity {
             try {
                 TextView tv_name = new TextView(this);
                 tv_name.setText(param.getJSONObject(i).getString("LABEL_NAME_CHS"));
+                tv_name.setWidth(40);
                 EditText ed_label = new EditText(this);
+                ed_label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.MATCH_PARENT));
                 ed_label.setLeft(5);
                 ed_label.setRight(5);
                 current_layout.addView(tv_name);

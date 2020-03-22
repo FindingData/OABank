@@ -11,7 +11,6 @@ import com.findingdata.oabank.R;
 import com.findingdata.oabank.base.BaseActivity;
 import com.findingdata.oabank.entity.BaseEntity;
 import com.findingdata.oabank.entity.EventBusMessage;
-import com.findingdata.oabank.entity.ProjectEntity;
 import com.findingdata.oabank.utils.KeyBoardUtils;
 import com.findingdata.oabank.utils.LogUtils;
 import com.findingdata.oabank.utils.http.HttpMethod;
@@ -20,6 +19,8 @@ import com.findingdata.oabank.utils.http.MyCallBack;
 import com.findingdata.oabank.utils.http.RequestParam;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xutils.common.util.LogUtil;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
@@ -38,11 +39,21 @@ public class AddNoteActivity extends BaseActivity {
     private EditText add_note_et_content;
 
     private int project_id;
+    private int actionid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        toolbar_tv_title.setText("备注");
+
         project_id=getIntent().getExtras().getInt("project_id");
+        actionid = getIntent().getExtras().getInt("actionid");
+        if (actionid == 1){
+            toolbar_tv_title.setText("备注");
+        }else if (actionid == 2){
+            toolbar_tv_title.setText("暂停项目");
+        }else if (actionid == 3){
+            toolbar_tv_title.setText("终止项目");
+        }
+
     }
 
     @Event({R.id.toolbar_btn_back,R.id.add_note_btn_save})
@@ -54,13 +65,21 @@ public class AddNoteActivity extends BaseActivity {
             case R.id.add_note_btn_save:
                 KeyBoardUtils.hideSoftInputMode(this, getWindow().peekDecorView());
                 if(TextUtils.isEmpty(add_note_et_content.getText().toString().trim())){
-                    showToast("留言内容不能为空");
+                    showToast("内容不能为空");
                     return;
                 }
-                addNote();
+                if (actionid == 1){
+                    addNote();
+                }else if (actionid == 2){
+                    modifyProjectStatus("40001005");
+                }else if (actionid ==3){
+                    modifyProjectStatus("40001003");
+                }
+
                 break;
         }
     }
+
     private void addNote(){
         RequestParam requestParam=new RequestParam();
         requestParam.setUrl(BASE_URL+"/api/project/AddProjectNote");
@@ -82,6 +101,51 @@ public class AddNoteActivity extends BaseActivity {
                 }else{
                     showToast(entity.getMessage());
                 }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    private void modifyProjectStatus(String statusVal){
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(BASE_URL+"/api/project/ModifyProjectStatus");
+        requestParam.setMethod(HttpMethod.Post);
+        Map<String,Object> requestMap=new HashMap<>();
+        requestMap.put("PROJECT_ID",project_id);
+        requestMap.put("project_status",statusVal);
+        requestMap.put("TERMINATION_REASON",add_note_et_content.getText());
+        requestParam.setPostRequestMap(requestMap);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                //BaseEntity<Integer> entity= JsonParse.parse(result,Integer.class);
+                try {
+                    JSONObject jsonobj = new JSONObject(result);
+                    if(jsonobj.getBoolean("status")){
+                        LogUtil.d("暂停项目"+jsonobj.toString());
+                        //EventBus.getDefault().post(new EventBusMessage<>("AddNote"));
+                        finish();
+                    }else{
+                        showToast(jsonobj.getString("Message"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
 
             @Override

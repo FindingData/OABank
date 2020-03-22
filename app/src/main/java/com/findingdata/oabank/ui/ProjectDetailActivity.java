@@ -403,6 +403,7 @@ public class ProjectDetailActivity extends BaseActivity {
             case R.id.project_detail_tv_note:
                 Bundle bundle=new Bundle();
                 bundle.putInt("project_id",project_id);
+                bundle.putInt("actionid",1);
                 startActivity(AddNoteActivity.class,bundle);
                 break;
             case R.id.add_note_btn_apply:
@@ -433,8 +434,8 @@ public class ProjectDetailActivity extends BaseActivity {
         Menu menu = popup.getMenu();
         menu.add(0, 2, 2, "项目暂停").setIcon(R.drawable.ic_action_pause_normal);
         menu.add(0, 3, 3, "项目终止").setIcon(R.drawable.ic_action_stop_normal);
-        menu.add(0, 4, 4, "价格异议").setIcon(R.drawable.ic_action_help);
-        menu.add(0, 5, 5, "改派公司").setIcon(R.drawable.ic_action_todo_normal);
+        menu.add(0, 4, 4, "继续项目").setIcon(R.drawable.ic_action_help);
+//        menu.add(0, 5, 5, "改派公司").setIcon(R.drawable.ic_action_todo_normal);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 showToast(item.getTitle().toString());
@@ -446,10 +447,11 @@ public class ProjectDetailActivity extends BaseActivity {
                         projectAction(2);
                         break;
                     case 3:
+                        projectAction(3);
 //                        startActivity(new Intent(ProjectDetailsActivity.this, ApplyTerminationActivity.class).putExtra("project_id", project_id));
                         break;
                     case 4:
-                        projectAction(6);
+                        projectAction(4);
                         break;
                     case 5:
 //                        startActivity(new Intent(ProjectDetailsActivity.this, AddNoteActivity.class).putExtra("project_id", project_id));
@@ -481,7 +483,58 @@ public class ProjectDetailActivity extends BaseActivity {
      * @param action 2:暂停,3:继续,6:价格异议
      */
     private void projectAction(int action) {
+        if (action == 2){
+            Bundle bundle=new Bundle();
+            bundle.putInt("project_id",project_id);
+            bundle.putInt("actionid",2);
+            startActivity(AddNoteActivity.class,bundle);
+        }else if (action == 3){
+            Bundle bundle=new Bundle();
+            bundle.putInt("project_id",project_id);
+            bundle.putInt("actionid",3);
+            startActivity(AddNoteActivity.class,bundle);
+        }else if (action == 4){
+            modifyProjectStatus("40001001");
+        }
+    }
 
+    private void modifyProjectStatus(String statusVal){
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(BASE_URL+"/api/project/ModifyProjectStatus");
+        requestParam.setMethod(HttpMethod.Post);
+        Map<String,Object> requestMap=new HashMap<>();
+        requestMap.put("PROJECT_ID",project_id);
+        requestMap.put("project_status",statusVal);
+        requestParam.setPostRequestMap(requestMap);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                BaseEntity<Integer> entity= JsonParse.parse(result,Integer.class);
+                if(entity.isStatus()){
+                    //LogUtil.d("留言ID"+entity.getResult());
+                    //EventBus.getDefault().post(new EventBusMessage<>("AddNote"));
+                    //finish();
+                    showToast("启用成功");
+                }else{
+                    showToast(entity.getMessage());
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
     }
 
     @Override
