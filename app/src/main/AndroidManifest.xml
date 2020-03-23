@@ -26,7 +26,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.PropertyAttachmentActivity"></activity>
+        <activity android:name=".ui.BusinessApplyActivity"></activity>
+        <activity android:name=".ui.PropertyAttachmentActivity" />
         <activity
             android:name=".ui.LaunchActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|keyboard"
@@ -59,12 +60,10 @@
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
-        </receiver>
-        <!-- 蒲公英APPKEY 必填 -->
+        </receiver> <!-- 蒲公英APPKEY 必填 -->
         <meta-data
             android:name="PGYER_APPID"
-            android:value="cef60f3b528bff367cf899a3f896c8cb" />
-        <!-- 用户自定义服务继承自GTIntentService,作为SDK与APP桥梁服务,用来接收各种消息和命令回复 -->
+            android:value="cef60f3b528bff367cf899a3f896c8cb" /> <!-- 用户自定义服务继承自GTIntentService,作为SDK与APP桥梁服务,用来接收各种消息和命令回复 -->
         <service
             android:name=".receiver.GeTuiIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE" /> <!-- 配置SDK核心服务 -->
