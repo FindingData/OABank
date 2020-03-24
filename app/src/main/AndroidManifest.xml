@@ -26,7 +26,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.BusinessApplyActivity"></activity>
+        <activity android:name=".ui.CustomerListActivity"></activity>
+        <activity android:name=".ui.BusinessApplyActivity" />
         <activity android:name=".ui.PropertyAttachmentActivity" />
         <activity
             android:name=".ui.LaunchActivity"

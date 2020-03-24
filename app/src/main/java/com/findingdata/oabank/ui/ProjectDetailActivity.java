@@ -407,7 +407,9 @@ public class ProjectDetailActivity extends BaseActivity {
                 startActivity(AddNoteActivity.class,bundle);
                 break;
             case R.id.add_note_btn_apply:
-                showToast("申请");
+                Bundle bundle1=new Bundle();
+                bundle1.putInt("project_id",project_id);
+                startActivity(BusinessApplyActivity.class,bundle1);
                 break;
             case R.id.add_note_btn_estimate:
                 showToast("评估成果");
