@@ -437,6 +437,7 @@ public class ProjectDetailActivity extends BaseActivity {
         menu.add(0, 2, 2, "项目暂停").setIcon(R.drawable.ic_action_pause_normal);
         menu.add(0, 3, 3, "项目终止").setIcon(R.drawable.ic_action_stop_normal);
         menu.add(0, 4, 4, "继续项目").setIcon(R.drawable.ic_action_help);
+        menu.add(0,5,5,"派单").setIcon(R.drawable.ic_action_help);
 //        menu.add(0, 5, 5, "改派公司").setIcon(R.drawable.ic_action_todo_normal);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
@@ -457,6 +458,7 @@ public class ProjectDetailActivity extends BaseActivity {
                         break;
                     case 5:
 //                        startActivity(new Intent(ProjectDetailsActivity.this, AddNoteActivity.class).putExtra("project_id", project_id));
+                        projectAction(5);
                         break;
                 }
                 return true;
@@ -497,6 +499,10 @@ public class ProjectDetailActivity extends BaseActivity {
             startActivity(AddNoteActivity.class,bundle);
         }else if (action == 4){
             modifyProjectStatus("40001001");
+        }else if (action == 5){
+            Bundle bundle=new Bundle();
+            bundle.putInt("project_id",project_id);
+            startActivity(CustomerListActivity.class,bundle);
         }
     }
 

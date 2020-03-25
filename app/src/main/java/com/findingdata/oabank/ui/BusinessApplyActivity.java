@@ -28,7 +28,7 @@ import java.util.Map;
 
 import static com.findingdata.oabank.base.Config.BASE_URL;
 
-@ContentView(R.layout.activity_add_note)
+@ContentView(R.layout.activity_business_apply)
 public class BusinessApplyActivity extends BaseActivity {
 
     @ViewInject(R.id.business_bg)
@@ -55,7 +55,7 @@ public class BusinessApplyActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_business_apply);
+
         toolbar_tv_title.setText("申请报告");
         project_id=getIntent().getExtras().getInt("project_id");
         getProjectInfo();
