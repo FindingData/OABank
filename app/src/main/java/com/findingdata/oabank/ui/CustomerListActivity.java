@@ -10,6 +10,7 @@ import com.findingdata.oabank.R;
 import com.findingdata.oabank.adapter.CustomerListAdapter;
 import com.findingdata.oabank.base.BaseActivity;
 import com.findingdata.oabank.entity.CustomerEntity;
+import com.findingdata.oabank.entity.ProjectEntity;
 import com.findingdata.oabank.utils.LogUtils;
 import com.findingdata.oabank.utils.http.HttpMethod;
 import com.findingdata.oabank.utils.http.MyCallBack;
@@ -43,6 +44,7 @@ public class CustomerListActivity extends BaseActivity {
     private List<CustomerEntity> mList;
 
     private CustomerListAdapter adapter;
+    private ProjectEntity project;
 
     private int position;
 
@@ -52,6 +54,7 @@ public class CustomerListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         project_id=getIntent().getExtras().getInt("project_id");
+        project = (ProjectEntity) getIntent().getExtras().get("project");
 
         mrv.setLayoutManager(new LinearLayoutManager(this));
         mrv.addItemDecoration(new RecyclerViewDivider(this, LinearLayoutManager.HORIZONTAL));
@@ -86,6 +89,17 @@ public class CustomerListActivity extends BaseActivity {
                     if(jsonobj.getBoolean("status")){
                         LogUtil.d("派单成功"+jsonobj.toString());
                         //add project to oa
+                        Map<String,Object> projectMap = new HashMap<>();
+                        projectMap.put("PROJECT_NAME",project.getPROJECT_NAME());
+                        projectMap.put("PRIORITY_LEVEL",40052001);
+                        projectMap.put("PROJECT_TYPE","");
+                        projectMap.put("APPRAISAL_PURPOSE",40005001);
+                        projectMap.put("IS_FOLLOW",0);
+                        projectMap.put("IS_REMINDER",0);
+                        projectMap.put("DUE_DATE","");
+                        projectMap.put("IS_APPROVED",0);
+                        projectMap.put("BUSINESS_FORM_ID",project.getPROJECT_FORM_ID());
+
 
                     }else{
                         showToast(jsonobj.getString("Message"));
