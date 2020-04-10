@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.findingdata.oabank.base.Config.BASE_URL;
+import static com.findingdata.oabank.base.Config.OA_BASE_URL;
 
 @ContentView(R.layout.activity_customer_list)
 public class CustomerListActivity extends BaseActivity {
@@ -68,6 +69,50 @@ public class CustomerListActivity extends BaseActivity {
         //adapter = new CustomerListAdapter();
     }
 
+    private void addProjectToOA(Map<String,Object> projectMap){
+
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(OA_BASE_URL+"/Project/BankAddProject");
+        requestParam.setMethod(HttpMethod.Post);
+        Map<String,Object> requestMap=new HashMap<>();
+        requestMap.put("ProjectModel",projectMap);
+        requestParam.setPostRequestMap(requestMap);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                //BaseEntity<Integer> entity= JsonParse.parse(result,Integer.class);
+                try {
+                    JSONObject jsonobj = new JSONObject(result);
+                    if(jsonobj.getBoolean("status")){
+                        LogUtil.d("增加至OA成功"+jsonobj.toString());
+                        //add project to oa
+
+
+                    }else{
+                        showToast(jsonobj.getString("Message"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
     private void manualDipatch(){
 
         RequestParam requestParam=new RequestParam();
@@ -99,7 +144,15 @@ public class CustomerListActivity extends BaseActivity {
                         projectMap.put("DUE_DATE","");
                         projectMap.put("IS_APPROVED",0);
                         projectMap.put("BUSINESS_FORM_ID",project.getPROJECT_FORM_ID());
-
+                        projectMap.put("PROPERTY_LIST",project.getPROPERTY_LIST());
+                        projectMap.put("BUSINESS_LIST",project.getBUSINESS());
+                        projectMap.put("REQUIRE_ESTIMATE",0);
+                        projectMap.put("REQUIRED_AUDIT",0);
+                        projectMap.put("CRM_CUSTOMER_ID","");
+                        projectMap.put("CRM_CUSTOMER_NAME","");
+                        projectMap.put("PROJECT_CODE","");
+                        projectMap.put("CUSTOMER_ID",mList.get(position).getCUSTOMER_ID());
+                        projectMap.put("BANK_PROJECT_ID",project.getPROJECT_ID());
 
                     }else{
                         showToast(jsonobj.getString("Message"));
@@ -107,7 +160,6 @@ public class CustomerListActivity extends BaseActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
 
             @Override
