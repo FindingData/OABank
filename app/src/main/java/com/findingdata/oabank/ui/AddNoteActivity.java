@@ -97,6 +97,7 @@ public class AddNoteActivity extends BaseActivity {
                 if(entity.isStatus()){
                     LogUtil.d("留言ID"+entity.getResult());
                     EventBus.getDefault().post(new EventBusMessage<>("AddNote"));
+                    //AddNoteActivity.this.finish();
                     finish();
                 }else{
                     showToast(entity.getMessage());
@@ -135,9 +136,10 @@ public class AddNoteActivity extends BaseActivity {
                 //BaseEntity<Integer> entity= JsonParse.parse(result,Integer.class);
                 try {
                     JSONObject jsonobj = new JSONObject(result);
-                    if(jsonobj.getBoolean("status")){
+                    if(jsonobj.getBoolean("Status")){
                         LogUtil.d("暂停项目"+jsonobj.toString());
                         //EventBus.getDefault().post(new EventBusMessage<>("AddNote"));
+                        //AddNoteActivity.this.finish();
                         finish();
                     }else{
                         showToast(jsonobj.getString("Message"));

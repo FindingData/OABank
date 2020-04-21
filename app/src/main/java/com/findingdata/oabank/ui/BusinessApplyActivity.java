@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.findingdata.oabank.R;
 import com.findingdata.oabank.base.BaseActivity;
 import com.findingdata.oabank.utils.LogUtils;
+import com.findingdata.oabank.utils.Utils;
 import com.findingdata.oabank.utils.http.HttpMethod;
 import com.findingdata.oabank.utils.http.MyCallBack;
 import com.findingdata.oabank.utils.http.RequestParam;
@@ -113,13 +114,13 @@ public class BusinessApplyActivity extends BaseActivity {
         try{
             tx_business_bg.setText("报告");
             String borrower = jsonobj.getString("BORROWER");
-            tx_borrower.setText(borrower);
+            tx_borrower.setText(Utils.dealwithNull(borrower));
             String borrower_telephone = jsonobj.getString("BORROWER_PHONE");
-            tx_borrower_telephone.setText(borrower_telephone);
+            tx_borrower_telephone.setText(Utils.dealwithNull(borrower_telephone));
             String client = jsonobj.getString("CONTACT_PERSON");
-            tx_client.setText(client);
+            tx_client.setText(Utils.dealwithNull(client));
             String client_telephone = jsonobj.getString("CONTACT_PHONE");
-            tx_client_telephone.setText(client_telephone);
+            tx_client_telephone.setText(Utils.dealwithNull(client_telephone));
 
             JSONArray property_list = jsonobj.getJSONArray("PROPERTY_LIST");
             for (int i = 0; i<property_list.length(); i++){

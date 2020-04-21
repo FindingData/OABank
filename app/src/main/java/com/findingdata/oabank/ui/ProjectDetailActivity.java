@@ -48,6 +48,8 @@ import com.zhihu.matisse.Matisse;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xutils.common.util.LogUtil;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
@@ -542,15 +544,20 @@ public class ProjectDetailActivity extends BaseActivity {
             public void onSuccess(String result) {
                 super.onSuccess(result);
                 LogUtils.d("result",result);
-                BaseEntity<Integer> entity= JsonParse.parse(result,Integer.class);
-                if(entity.isStatus()){
-                    //LogUtil.d("留言ID"+entity.getResult());
-                    //EventBus.getDefault().post(new EventBusMessage<>("AddNote"));
-                    //finish();
-                    showToast("启用成功");
-                }else{
-                    showToast(entity.getMessage());
+                try {
+                    JSONObject jsonobj = new JSONObject(result);
+                    if(jsonobj.getBoolean("Status")){
+                        LogUtil.d("暂停项目"+jsonobj.toString());
+                        //EventBus.getDefault().post(new EventBusMessage<>("AddNote"));
+                        //AddNoteActivity.this.finish();
+                        finish();
+                    }else{
+                        showToast(jsonobj.getString("Message"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+
             }
 
             @Override

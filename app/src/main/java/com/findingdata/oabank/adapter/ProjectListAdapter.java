@@ -37,10 +37,23 @@ public class ProjectListAdapter extends BaseQuickAdapter<ProjectEntity, BaseView
         }
         helper.setText(R.id.project_list_type,aplication_type);
         helper.setText(R.id.project_list_name,Utils.dealwithNull(item.getPROJECT_NAME()));
-        helper.setText(R.id.project_list_client,Utils.dealwithNull(item.getSHORT_NAME()));
-        helper.setText(R.id.project_list_price,Utils.dealwithNull(item.getLOAN_AMOUNT()+"万"));
+        if (item.getPROJECT_STATUS() == 40001006){
+            helper.setText(R.id.project_list_client,Utils.dealwithNull(item.getSHORT_NAME()));
+            helper.setText(R.id.project_list_price,Utils.dealwithNull(item.getLOAN_AMOUNT()+"万"));
+        }else{
+            helper.setText(R.id.project_list_client,Utils.dealwithNull(business_list.get(0).getCOMMISSIONED_NAME()));
+            if (business_list.get(0).getTOTAL_PRICE()!=0)
+                helper.setText(R.id.project_list_price,Utils.dealwithNull(business_list.get(0).getTOTAL_PRICE()+"万"));
+        }
+
+
         helper.setText(R.id.project_list_loan,Utils.dealwithNull(item.getLOAN_TYPE_CHS()));
-        helper.setText(R.id.project_list_contact,item.getBORROWER());
-        helper.setText(R.id.project_list_time, Utils.transformIOSTime(item.getCONFIRM_TIME()));
+        helper.setText(R.id.project_list_contact,"    "+Utils.dealwithNull(item.getBORROWER()));
+        if (item.getCONFIRM_TIME().length()>11){
+            helper.setText(R.id.project_list_time, Utils.transformIOSTime(item.getCONFIRM_TIME().substring(0,11)));
+        }else{
+            helper.setText(R.id.project_list_time, Utils.transformIOSTime(item.getCONFIRM_TIME()));
+        }
+
     }
 }

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.findingdata.oabank.R;
 import com.findingdata.oabank.base.BaseActivity;
 import com.findingdata.oabank.utils.LogUtils;
+import com.findingdata.oabank.utils.Utils;
 import com.findingdata.oabank.utils.http.HttpMethod;
 import com.findingdata.oabank.utils.http.MyCallBack;
 import com.findingdata.oabank.utils.http.RequestParam;
@@ -258,15 +259,15 @@ public class AddObjectActivity extends BaseActivity {
 
         try {
             property = new JSONObject( getIntent().getExtras().getString("property"));
-            ed_property_name.setText(property.getString("PROPERTY_NAME"));
-            ed_property_address.setText(property.getString("ADDRESS"));
-            ed_property_area.setText(property.getString("AREA"));
-            ed_inspection_contact.setText(property.getString("INSPECTION_CONTACT"));
-            ed_inspection_contact_phone.setText(property.getString("INSPECTION_CONTACT_PHONE"));
-            ed_property_owner.setText(property.getJSONArray("PROPERTY_RIGHTS").getJSONObject(0).getString("PROPERTY_OWNER"));
-            ed_property_owner_telephone.setText(property.getJSONArray("PROPERTY_RIGHTS").getJSONObject(0).getString("PROPERTY_OWNER_PHONE"));
-            ed_property_owner_idcard.setText(property.getJSONArray("PROPERTY_RIGHTS").getJSONObject(0).getString("PROPERTY_OWNER_ID"));
-            ed_property_owner_code.setText(property.getJSONArray("PROPERTY_RIGHTS").getJSONObject(0).getString("PROPERTY_CERTIFICATE"));
+            ed_property_name.setText(Utils.dealwithNull(property.getString("PROPERTY_NAME")));
+            ed_property_address.setText(Utils.dealwithNull(property.getString("ADDRESS")));
+            ed_property_area.setText(Utils.dealwithNull(property.getString("AREA")));
+            ed_inspection_contact.setText(Utils.dealwithNull(property.getString("INSPECTION_CONTACT")));
+            ed_inspection_contact_phone.setText(Utils.dealwithNull(property.getString("INSPECTION_CONTACT_PHONE")));
+            ed_property_owner.setText(Utils.dealwithNull(property.getJSONArray("PROPERTY_RIGHTS").getJSONObject(0).getString("PROPERTY_OWNER")));
+            ed_property_owner_telephone.setText(Utils.dealwithNull(property.getJSONArray("PROPERTY_RIGHTS").getJSONObject(0).getString("PROPERTY_OWNER_PHONE")));
+            ed_property_owner_idcard.setText(Utils.dealwithNull(property.getJSONArray("PROPERTY_RIGHTS").getJSONObject(0).getString("PROPERTY_OWNER_ID")));
+            ed_property_owner_code.setText(Utils.dealwithNull(property.getJSONArray("PROPERTY_RIGHTS").getJSONObject(0).getString("PROPERTY_CERTIFICATE")));
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -277,17 +278,18 @@ public class AddObjectActivity extends BaseActivity {
     public void deleteProperty()  {
         RequestParam requestParam=new RequestParam();
 //        requestParam.setUrl(BASE_URL+"/api/Project/GetProjectInfo");
-        requestParam.setUrl(BASE_URL+"/api/Property/DeleteProperty");
-        requestParam.setMethod(HttpMethod.Post);
-        Map<String,Object> requestMap=new HashMap<>();
+//        requestParam.setUrl(BASE_URL+"/api/Property/DeleteProperty");
+        requestParam.setMethod(HttpMethod.Delete);
+//        Map<String,Object> requestMap=new HashMap<>();
         String property_id = "";
         try {
             property_id = property.getString("PROPERTY_ID");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        requestMap.put("property_id",property_id);
-        requestParam.setPostRequestMap(requestMap);
+//        requestMap.put("property_id",property_id);
+//        requestParam.setPostRequestMap(requestMap);
+        requestParam.setUrl(BASE_URL+"/api/Property/DeleteProperty"+"?property_id="+property_id);
         requestParam.setCallback(new MyCallBack<String>(){
             @Override
             public void onSuccess(String result) {
@@ -322,7 +324,7 @@ public class AddObjectActivity extends BaseActivity {
     public void initObject(){
         RequestParam requestParam=new RequestParam();
 //        requestParam.setUrl(BASE_URL+"/api/Project/GetProjectInfo");
-        String project_id = getIntent().getExtras().getString("project_id");
+        int project_id = getIntent().getExtras().getInt("project_id");
         requestParam.setUrl(BASE_URL+"/api/Property/InitProjectProperty?project_id="+project_id);
         requestParam.setMethod(HttpMethod.Post);
         Map<String,Object> requestMap=new HashMap<>();
@@ -441,7 +443,6 @@ public class AddObjectActivity extends BaseActivity {
                 try {
                     JSONObject jsonObject=new JSONObject(result);
                     if (jsonObject.getBoolean("Status")){
-                        showToast("立项成功");
                        AddObjectActivity.this.finish();
                     }
                 } catch (JSONException e) {

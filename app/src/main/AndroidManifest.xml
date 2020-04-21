@@ -50,7 +50,7 @@
             android:value="cef60f3b528bff367cf899a3f896c8cb" /> <!-- 蒲公英APPKEY 必填 -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.findingdata.oabank.fileprovider"
+            android:authorities="com.findingdata.oabank.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true"
             tools:replace="android:authorities">

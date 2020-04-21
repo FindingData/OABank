@@ -14,6 +14,7 @@ import org.xutils.x;
 import java.util.Map;
 
 import static com.findingdata.oabank.base.Config.BASE_URL;
+import static org.xutils.http.HttpMethod.DELETE;
 
 /**
  * Created by Loong on 2019/11/20.
@@ -128,6 +129,25 @@ public class XHttp {
         params.setAutoResume(true);
         params.setSaveFilePath(filepath);
         return x.http().get(params, callback);
+    }
+
+    public static <T> Callback.Cancelable Delete(String url, Map<String, Object> map, Callback.CommonCallback<T> callback) {
+        LogUtil.d(url);
+        RequestParams params = new RequestParams(url);
+        if(!url.equals(BASE_URL+"/api/Home/Login")){
+            StringBuilder sbCookie = new StringBuilder();
+            sbCookie.append(Config.COOKIE_NAME).append("=")
+                    .append(TokenUtils.getToken());
+            params.addHeader("Cookie",sbCookie.toString());
+            params.setUseCookie(false);
+            LogUtils.d("Cookie",sbCookie);
+        }
+        if (null != map) {
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                params.addParameter(entry.getKey(), entry.getValue());
+            }
+        }
+        return x.http().request(DELETE,params, callback);
     }
 
 }

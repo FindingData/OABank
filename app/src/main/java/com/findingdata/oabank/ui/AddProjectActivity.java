@@ -318,8 +318,8 @@ public class AddProjectActivity extends BaseActivity {
                             jsonObject1.put("CRM_CUSTOMER_ID","");
                             jsonObject1.put("CRM_SUCTOMER_NAME","");
                             jsonObject1.put("PROJECT_CODE","");
-                            jsonObject1.put("CUSTOMER_ID",jsonObject.getJSONObject("Result").getJSONArray("DISPATCH_CUSTOMER_LIST").getJSONObject(0).getString("CUSTOMER_ID"));
-                            jsonObject1.put("BANK_PROJECT_ID",project.getString("PROJECT_ID"));
+                            jsonObject1.put("CUSTOMER_ID",jsonObject.getJSONObject("Result").getJSONArray("DISPATCH_CUSTOMER_LIST").getJSONObject(0).getInt("CUSTOMER_ID"));
+                            jsonObject1.put("BANK_PROJECT_ID",project.getInt("PROJECT_ID"));
                             addProjectToOA(jsonObject1,jsonObject.getJSONObject("Result").getJSONArray("DISPATCH_CUSTOMER_LIST").getJSONObject(0),jsonObject.getJSONObject("Result").getJSONObject("DISPATCH_RESULT").getString("CUSTOMER_NAME"));
                         }else{
                             AddProjectActivity.this.finish();
@@ -360,6 +360,7 @@ public class AddProjectActivity extends BaseActivity {
                 try {
                     JSONObject jsonObject=new JSONObject(result);
                     if (jsonObject.getBoolean("Status")){
+                        showToast("立项成功");
                         AddProjectActivity.this.finish();
                     }
                 } catch (JSONException e) {
@@ -458,8 +459,8 @@ public class AddProjectActivity extends BaseActivity {
         requestParam.setUrl(OA_BASE_URL+"/DynamicForm/BankGetFormListByCompanyId");
         requestParam.setMethod(HttpMethod.Get);
         Map<String,Object> requestMap=new HashMap<>();
-        requestMap.put("formType","11");
-        requestMap.put("companyID","389");
+        requestMap.put("formType","1");
+        requestMap.put("companyID","3");
         requestParam.setGetRequestMap(requestMap);
         requestParam.setCallback(new MyCallBack<String>(){
             @Override

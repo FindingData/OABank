@@ -92,7 +92,7 @@ public class Utils {
     }
 
     public static String dealwithNull(String key){
-        if (key == null){
+        if (key == null || key.equals("null")){
             return "";
         }else {
             return key;

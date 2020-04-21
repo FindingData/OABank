@@ -5,6 +5,11 @@
     android:background="@color/body_background"
     android:orientation="vertical">
     <include layout="@layout/toolbar_layout" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -218,4 +223,6 @@
                 android:textSize = "14sp"></TextView>
         </LinearLayout>
     </LinearLayout>
+    </ScrollView>
+
 </LinearLayout>
