@@ -2,7 +2,6 @@ package com.findingdata.oabank.base;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -58,7 +57,7 @@ public class BaseActivity extends FragmentActivity implements NetBroadcastReceiv
         //设置无标题
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //垂直显示
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         if(isFullScreen){
             if(showStatus){

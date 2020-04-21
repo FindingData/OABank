@@ -78,7 +78,7 @@ public class NavigationViewFragment extends BaseFragment {
         requestParam.setUrl(BASE_URL+"/api/Project/GetQueryItems");
         requestParam.setMethod(HttpMethod.Get);
         Map<String,String> map=new HashMap<>();
-        map.put("RESOURCEID", "9001001");
+        map.put("RESOURCEID", "011005");
         requestParam.setGetRequestMap(map);
         requestParam.setCallback(new MyCallBack<String>(){
             @Override

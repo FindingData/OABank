@@ -109,6 +109,7 @@ public class ProjectCenterListFragment extends BaseFragment implements SwipeRefr
             public void onSimpleItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Bundle bundle=new Bundle();
                 bundle.putInt("project_id",dataList.get(position).getPROJECT_ID());
+                bundle.putInt("project_status",listType);
                 startActivity(ProjectDetailActivity.class,bundle);
             }
         });

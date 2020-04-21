@@ -2,16 +2,26 @@ package com.findingdata.oabank.ui;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.findingdata.oabank.R;
+import com.findingdata.oabank.adapter.PropertyListAdapter;
 import com.findingdata.oabank.base.BaseActivity;
+import com.findingdata.oabank.entity.ApplyBusiness;
+import com.findingdata.oabank.entity.FormLabelData;
+import com.findingdata.oabank.entity.PropertyEntity;
 import com.findingdata.oabank.utils.LogUtils;
 import com.findingdata.oabank.utils.http.HttpMethod;
 import com.findingdata.oabank.utils.http.MyCallBack;
 import com.findingdata.oabank.utils.http.RequestParam;
+import com.findingdata.oabank.weidgt.RecyclerViewDivider;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,10 +30,15 @@ import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
 import org.xutils.view.annotation.ViewInject;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static com.findingdata.oabank.base.Config.BASE_URL;
 import static com.findingdata.oabank.base.Config.OA_BASE_URL;
@@ -35,28 +50,116 @@ import static com.findingdata.oabank.base.Config.OA_BASE_URL;
  */
 @ContentView(R.layout.activity_add_project)
 public class AddProjectActivity extends BaseActivity {
-    @ViewInject(R.id.toolbar_tv_title)
-    private TextView toolbar_title;
+
     @ViewInject(R.id.project_content)
     private LinearLayout _project_content;
+    private TextView add_object;
+    private TextView submit;
+    private EditText loan_money;
+    private EditText jiekuanren;
+    private EditText jiekuanrendianhua;
+    private EditText weituoren;
+    private EditText weituorendianhua;
+
+    private RecyclerView mrv;
+    private List<PropertyEntity> mList;
+    private PropertyListAdapter adapter;
 
     private String formid;
+    private String project_form_id;
     private JSONArray formContentValue;
     private JSONArray formContents;
-    private String project_id;
+    private JSONObject project;
+    private JSONArray property_list;
+    private int project_id = 0;
+
+    String project_type;
+    String loan_type;
+
+    String[] project_types = new String[0];
+    String[] project_type_chs = new String[0];
+
+    String[] loan_types = new String[0];
+    String[] loan_type_chs = new String[0];
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        toolbar_title.setText("新增项目");
+
         formContentValue = new JSONArray();
         getFormList();
+
+        add_object = findViewById(R.id.add_object);
+        add_object.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle=new Bundle();
+                bundle.putInt("project_id",project_id);
+                bundle.putString("type","add");
+                startActivity(AddObjectActivity.class,bundle);
+            }
+        });
+        submit = findViewById(R.id.submit);
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (property_list != null && property_list.length()>0){
+                    if (formContentValue.length()>0){
+                        try {
+                            JSONArray jsonarray = new JSONArray();
+                            for (int i = 0; i<formContentValue.length(); i++) {
+                                JSONObject dic_obj = new JSONObject();
+
+                                dic_obj.put("ID", formContentValue.getJSONObject(i).getString("LABEL_ID"));
+                                if (i == 0) {
+                                    dic_obj.put("VALUE", project_type);
+                                } else if (i == 1) {
+                                    dic_obj.put("VALUE", loan_type);
+                                } else if (i == 2) {
+                                    dic_obj.put("VALUE", loan_money.getText().toString());
+                                } else if (i == 3) {
+                                    dic_obj.put("VALUE", jiekuanren.getText().toString());
+                                } else if (i == 4) {
+                                    dic_obj.put("VALUE", jiekuanrendianhua.getText().toString());
+                                } else if (i == 5) {
+                                    dic_obj.put("VALUE", weituoren.getText().toString());
+                                } else if (i == 6) {
+                                    dic_obj.put("VALUE", weituorendianhua.getText().toString());
+                                }
+                                jsonarray.put(dic_obj);
+                            }
+                            Map<String,Object> requestMap=new HashMap<>();
+                            requestMap.put("labelKeyValueList",jsonarray);
+                            requestMap.put("FORM_ID",formid);
+                            requestMap.put("formStoreID",project.getString("PROJECT_FORM_ID"));
+                            BankSaveFormData(requestMap);
+
+                        }  catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }else{
+                    showToast("请添加抵押物");
+                }
+
+            }
+        });
+
+        loan_money = findViewById(R.id.loan_money);
+        jiekuanren = findViewById(R.id.jiekuanren);
+        jiekuanrendianhua = findViewById(R.id.jiekuanrendianhua);
+        weituoren = findViewById(R.id.weituoren);
+        weituorendianhua = findViewById(R.id.weituorendianhua);
+
     }
 
     @Override
     protected  void onStart(){
         super.onStart();
-        getProperty();
+        if (project_id !=0){
+            getProperty();
+        }
     }
 
     @Event({R.id.toolbar_btn_back})
@@ -68,12 +171,223 @@ public class AddProjectActivity extends BaseActivity {
         }
     }
 
+    public void BankSaveFormData(Map<String,Object> param){
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(OA_BASE_URL+"/DynamicForm/BankSaveFormData");
+        requestParam.setMethod(HttpMethod.PostJson);
+        requestParam.setPostJsonRequest(param);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                try {
+                    JSONObject jsonObject=new JSONObject(result);
+                    if (jsonObject.getBoolean("Status")){
+                        project_form_id = jsonObject.getString("Result");
+                        List<FormLabelData> jsonarray = new ArrayList<FormLabelData>();
+                        FormLabelData jsonobj = new FormLabelData();
+                        jsonobj.setKey("id");
+                        jsonobj.setValue(project_id+"");
+                        jsonarray.add(jsonobj);
+                        jsonobj = new FormLabelData();
+                        jsonobj.setKey("project_form_id");
+                        jsonobj.setValue(project_form_id);
+                        jsonarray.add(jsonobj);
+                        jsonobj = new FormLabelData();
+                        jsonobj.setKey("project_name");
+                        jsonobj.setValue(property_list.getJSONObject(0).getString("PROPERTY_NAME"));
+                        jsonarray.add(jsonobj);
+
+                        for (int i = 0; i<formContentValue.length(); i++){
+                            if (!formContents.getJSONObject(i).getString("BINDEXPANDFIELD").equals("") && formContents.getJSONObject(i).getString("BINDEXPANDFIELD") != null){
+                                jsonobj = new FormLabelData();
+                                jsonobj.setKey(formContents.getJSONObject(i).getString("BINDEXPANDFIELD"));
+                                if (i == 0) {
+                                    jsonobj.setValue( project_type);
+                                } else if (i == 1) {
+                                    jsonobj.setValue( loan_type);
+                                } else if (i == 2) {
+                                    jsonobj.setValue( loan_money.getText().toString());
+                                } else if (i == 3) {
+                                    jsonobj.setValue( jiekuanren.getText().toString());
+                                } else if (i == 4) {
+                                    jsonobj.setValue( jiekuanrendianhua.getText().toString());
+                                } else if (i == 5) {
+                                    jsonobj.setValue( weituoren.getText().toString());
+                                } else if (i == 6) {
+                                    jsonobj.setValue( weituorendianhua.getText().toString());
+                                }
+                                jsonarray.add(jsonobj);
+                            }
+                        }
+                        saveProject(jsonarray);
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    private void saveProject(List<FormLabelData> jsonarray){
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(BASE_URL+"/api/Project/SaveProject");
+        requestParam.setMethod(HttpMethod.PostJson);
+//        Map<String,Object> requestMap=new HashMap<>();
+//        requestMap.put("labelValueList",jsonarray);
+        requestParam.setPostJsonRequest(jsonarray);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                try {
+                    JSONObject jsonObject=new JSONObject(result);
+                    if (jsonObject.getBoolean("Status")){
+                        applyProject();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    private void applyProject(){
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(BASE_URL+"/api/Project/ApplyProject");
+        requestParam.setMethod(HttpMethod.PostJson);
+        ApplyBusiness jsonobj = new ApplyBusiness();
+
+            jsonobj.setProject_id(project_id+"");
+            jsonobj.setBusiness_list(new int[]{40004001, 40004002});
+
+
+        requestParam.setPostJsonRequest(jsonobj);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                try {
+                    JSONObject jsonObject=new JSONObject(result);
+                    if (jsonObject.getBoolean("Status")){
+                        if (jsonObject.getJSONObject("Result").getBoolean("IS_AUTO_DISPATCH")){
+                            Map<String,Object> jsonObject1 = new HashMap<>();
+                            jsonObject1.put("PROJECT_NAME",property_list.getJSONObject(0).getString("PROPERTY_NAME"));
+                            jsonObject1.put("PRIORITY_LEVEL",40052001);
+                            jsonObject1.put("PROJECT_TYPE","");
+                            jsonObject1.put("APPRAISAL_PURPOSE",40005001);
+                            jsonObject1.put("IS_FOLLOW",0);
+                            jsonObject1.put("IS_REMINDER",0);
+                            jsonObject1.put("DUE_DATE","");
+                            jsonObject1.put("IS_APPROVED",0);
+                            jsonObject1.put("BUSINESS_FORM_ID",project_form_id);
+                            jsonObject1.put("PROPERTY_LIST",property_list);
+                            jsonObject1.put("BUSINESS_LIST",new int[]{40004001, 40004002});
+                            jsonObject1.put("REQUIRE_ESTIMATE",0);
+                            jsonObject1.put("REQUIRED_AUDIT",0);
+                            jsonObject1.put("CRM_CUSTOMER_ID","");
+                            jsonObject1.put("CRM_SUCTOMER_NAME","");
+                            jsonObject1.put("PROJECT_CODE","");
+                            jsonObject1.put("CUSTOMER_ID",jsonObject.getJSONObject("Result").getJSONArray("DISPATCH_CUSTOMER_LIST").getJSONObject(0).getString("CUSTOMER_ID"));
+                            jsonObject1.put("BANK_PROJECT_ID",project.getString("PROJECT_ID"));
+                            addProjectToOA(jsonObject1,jsonObject.getJSONObject("Result").getJSONArray("DISPATCH_CUSTOMER_LIST").getJSONObject(0),jsonObject.getJSONObject("Result").getJSONObject("DISPATCH_RESULT").getString("CUSTOMER_NAME"));
+                        }else{
+                            AddProjectActivity.this.finish();
+                        }
+
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    private void addProjectToOA(Map<String,Object> dic, JSONObject customer, String projectCustomer){
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(OA_BASE_URL+"/Project/BankAddProject");
+        requestParam.setMethod(HttpMethod.PostJson);
+        requestParam.setPostJsonRequest(dic);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                try {
+                    JSONObject jsonObject=new JSONObject(result);
+                    if (jsonObject.getBoolean("Status")){
+                        AddProjectActivity.this.finish();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
     private void getProperty(){
         RequestParam requestParam=new RequestParam();
         requestParam.setUrl(BASE_URL+"/api/Property/GetPropertyListByProjectId");
         requestParam.setMethod(HttpMethod.Get);
         Map<String,Object> requestMap=new HashMap<>();
-        requestMap.put("project_id",project_id);
+        requestMap.put("project_id",project_id+"");
         requestParam.setGetRequestMap(requestMap);
         requestParam.setCallback(new MyCallBack<String>(){
             @Override
@@ -83,8 +397,9 @@ public class AddProjectActivity extends BaseActivity {
                 try {
                     JSONObject jsonObject=new JSONObject(result);
                     if (jsonObject.getBoolean("Status")){
-                        JSONArray dataArray = jsonObject.getJSONArray("Result");
-                        initPropertyList(dataArray);
+                        property_list = jsonObject.getJSONArray("Result");
+
+                        initPropertyList(property_list);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -107,7 +422,34 @@ public class AddProjectActivity extends BaseActivity {
     }
 
     private void initPropertyList(JSONArray array){
+        Gson gson=new Gson();
+        Type type = new TypeToken<List<PropertyEntity>>() {}.getType();
+        mrv = (RecyclerView) findViewById(R.id.rv_main);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mrv.setLayoutManager(layoutManager);
+        mrv.addItemDecoration(new RecyclerViewDivider(this, LinearLayoutManager.HORIZONTAL));
+        mList = new ArrayList<PropertyEntity>();
+        mList = gson.fromJson(array.toString(),type);
+        adapter = new PropertyListAdapter(mList);
+        adapter.setOnItemClickListener(new PropertyListAdapter.onItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                Bundle bundle=new Bundle();
+                bundle.putInt("project_id",project_id);
+                bundle.putString("type","edit");
+                try {
+                    bundle.putInt("property_id",property_list.getJSONObject(position).getInt("PROPERTY_ID"));
+                    bundle.putString("property",property_list.getJSONObject(position).toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                startActivity(AddObjectActivity.class,bundle);
+            }
+        });
+        mrv.setAdapter(adapter);
 
+
+        adapter.notifyDataSetChanged();
     }
 
     private void getFormList(){
@@ -116,8 +458,8 @@ public class AddProjectActivity extends BaseActivity {
         requestParam.setUrl(OA_BASE_URL+"/DynamicForm/BankGetFormListByCompanyId");
         requestParam.setMethod(HttpMethod.Get);
         Map<String,Object> requestMap=new HashMap<>();
-        requestMap.put("formType","1");
-        requestMap.put("companyID","3");
+        requestMap.put("formType","11");
+        requestMap.put("companyID","389");
         requestParam.setGetRequestMap(requestMap);
         requestParam.setCallback(new MyCallBack<String>(){
             @Override
@@ -180,8 +522,14 @@ public class AddProjectActivity extends BaseActivity {
                             jsonObject1.put("LABEL_ID",dataArray.getJSONObject(i).getString("FORM_LABEL_ID"));
                             jsonObject1.put("VALUE",value);
                             formContentValue.put(jsonObject1);
+                            if (i == 0){
+                                getProject_type(dataArray.getJSONObject(i).getString("DATA_DIC_SUB"));
+                            }else if (i ==1){
+                                getLoan_type(dataArray.getJSONObject(i).getString("DATA_DIC_SUB"));
+                            }
                         }
-                        createProjectView(dataArray);
+                        //createProjectView(dataArray);
+                        initProject();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -204,28 +552,186 @@ public class AddProjectActivity extends BaseActivity {
         sendRequest(requestParam,true);
     }
 
-    private void createProjectView(JSONArray param){
-        for (int i = 0; i<param.length();i++){
-            LinearLayout current_layout = new LinearLayout(this);
-            current_layout.setOrientation(LinearLayout.HORIZONTAL);
-            current_layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
-            current_layout.setTop(5);
+    private void initProject(){
+        RequestParam requestParam=new RequestParam();
+//        requestParam.setUrl(BASE_URL+"/api/Project/GetProjectInfo");
+        requestParam.setUrl(BASE_URL+"/api/Project/MInitProject");
+        requestParam.setMethod(HttpMethod.Get);
+        Map<String,Object> requestMap=new HashMap<>();
+        requestParam.setGetRequestMap(requestMap);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                try {
+                    JSONObject jsonObject=new JSONObject(result);
+                    if (jsonObject.getBoolean("Status")){
+                        JSONObject jsondata = jsonObject.getJSONObject("Result");
+                        project_id = jsondata.getInt("PROJECT_ID");
+                        project = jsondata;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                TextView tv_name = new TextView(this);
-                tv_name.setText(param.getJSONObject(i).getString("LABEL_NAME_CHS"));
-                tv_name.setWidth(40);
-                EditText ed_label = new EditText(this);
-                ed_label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.MATCH_PARENT));
-                ed_label.setLeft(5);
-                ed_label.setRight(5);
-                current_layout.addView(tv_name);
-                current_layout.addView(ed_label);
-                _project_content.addView(current_layout);
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
 
-        }
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    public void getProject_type(String dic_sub){
+        RequestParam requestParam=new RequestParam();
+//        requestParam.setUrl(BASE_URL+"/api/Project/GetProjectInfo");
+        requestParam.setUrl(OA_BASE_URL+"/DynamicForm/getSelectDicData?DATA_DIC_SUB="+dic_sub);
+        requestParam.setMethod(HttpMethod.Get);
+        Map<String,Object> requestMap=new HashMap<>();
+        requestParam.setGetRequestMap(requestMap);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                try {
+                    JSONObject jsonObject=new JSONObject(result);
+                    if (jsonObject.getBoolean("Status")){
+                        JSONArray jsonarray = jsonObject.getJSONArray("Result");
+                        for (int i = 0; i<jsonarray.length();i++){
+                            project_types = insert(project_types,jsonarray.getJSONObject(i).getString("DIC_PAR_ID"));
+                            project_type_chs = insert(project_type_chs,jsonarray.getJSONObject(i).getString("DIC_PAR_NAME"));
+                        }
+                        if (project_types.length>0){
+                            project_type = project_types[0];
+                        }
+
+                        initSpinner();
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    private static String[] insert(String[] arr, String str)
+    {
+        int size = arr.length;
+        String[] tmp = new String[size + 1];
+        System.arraycopy(arr, 0, tmp, 0, size);
+        tmp[size] = str;
+        return tmp;
+    }
+
+    public void initSpinner(){
+        Spinner project_type_spinner = findViewById(R.id.project_type);
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, project_type_chs);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        project_type_spinner .setAdapter(adapter);
+        project_type_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int pos, long id) {
+                project_type = project_types[pos];
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Another interface callback
+            }
+        });
+
+    }
+
+    public void getLoan_type(String dic_sub){
+        RequestParam requestParam=new RequestParam();
+//        requestParam.setUrl(BASE_URL+"/api/Project/GetProjectInfo");
+        requestParam.setUrl(OA_BASE_URL+"/DynamicForm/getSelectDicData?DATA_DIC_SUB="+dic_sub);
+        requestParam.setMethod(HttpMethod.Get);
+        Map<String,Object> requestMap=new HashMap<>();
+        requestParam.setGetRequestMap(requestMap);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                try {
+                    JSONObject jsonObject=new JSONObject(result);
+                    if (jsonObject.getBoolean("Status")){
+                        JSONArray jsonarray = jsonObject.getJSONArray("Result");
+                        for (int i = 0; i<jsonarray.length();i++){
+                            loan_types = insert(loan_types,jsonarray.getJSONObject(i).getString("DIC_PAR_ID"));
+                            loan_type_chs = insert(loan_type_chs,jsonarray.getJSONObject(i).getString("DIC_PAR_NAME"));
+                        }
+                        if (loan_types.length>0){
+                            loan_type = loan_types[0];
+                        }
+
+                        initSpinner1();
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    public void initSpinner1(){
+        Spinner loan_type_spinner = findViewById(R.id.loan_type);
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, loan_type_chs);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        loan_type_spinner .setAdapter(adapter);
+        loan_type_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int pos, long id) {
+                loan_type = loan_types[pos];
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Another interface callback
+            }
+        });
+
     }
 }

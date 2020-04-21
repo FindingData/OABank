@@ -7,13 +7,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.findingdata.oabank.R;
 import com.findingdata.oabank.entity.CustomerEntity;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class CustomerListAdapter extends RecyclerView.Adapter<CustomerListAdapter.ViewHolder > {
     private List<CustomerEntity> mlist ;
@@ -47,10 +47,10 @@ public class CustomerListAdapter extends RecyclerView.Adapter<CustomerListAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         CustomerEntity customerEntity = mlist.get(position);
         holder.tv_customer.setText(customerEntity.getCUSTOMER_NAME());
-        holder.tv_process.setText(customerEntity.getPROCESSING());
-        holder.tv_total.setText(customerEntity.getTOTAL());
+        holder.tv_process.setText("执行中项目："+customerEntity.getPROCESSING());
+        holder.tv_total.setText("所有项目："+customerEntity.getTOTAL()+"");
         holder.tv_link_man.setText(customerEntity.getBUSINESS_CONTACT());
-        holder.tv_link_telephone.setText(customerEntity.getPHONE());
+        holder.tv_link_telephone.setText(customerEntity.getPHONE()+"");
 
         if (position == mposition) {
             holder.img_select.setVisibility(View.VISIBLE);
@@ -62,7 +62,7 @@ public class CustomerListAdapter extends RecyclerView.Adapter<CustomerListAdapte
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mlist.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

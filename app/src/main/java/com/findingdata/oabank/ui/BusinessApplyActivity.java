@@ -1,10 +1,8 @@
 package com.findingdata.oabank.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -43,10 +41,11 @@ public class BusinessApplyActivity extends BaseActivity {
     private TextView tx_client_telephone;
     @ViewInject(R.id.object)
     private TextView tx_object;
-    @ViewInject(R.id.toolbar_tv_title)
-    private TextView toolbar_tv_title;
+
     @ViewInject(R.id.property_list)
     private LinearLayout ll_property_list;
+    @ViewInject(R.id.submit)
+    private TextView submit;
 
     private int project_id;
 
@@ -56,9 +55,15 @@ public class BusinessApplyActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        toolbar_tv_title.setText("申请报告");
+
         project_id=getIntent().getExtras().getInt("project_id");
         getProjectInfo();
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                applyProject();
+            }
+        });
     }
 
     private void getProjectInfo(){
@@ -76,7 +81,7 @@ public class BusinessApplyActivity extends BaseActivity {
                 //BaseEntity<Integer> entity= JsonParse.parse(result,Integer.class);
                 try {
                     JSONObject jsonobj = new JSONObject(result);
-                    if(jsonobj.getBoolean("status")){
+                    if(jsonobj.getBoolean("Status")){
                         LogUtil.d("申请报告界面详情"+jsonobj.toString());
                         project = jsonobj.getJSONObject("Result");
                         initView(jsonobj.getJSONObject("Result"));
@@ -148,7 +153,7 @@ public class BusinessApplyActivity extends BaseActivity {
     private void applyProject(){
         RequestParam requestParam=new RequestParam();
         requestParam.setUrl(BASE_URL+"/api/project/ApplyProjectBusiness");
-        requestParam.setMethod(HttpMethod.Get);
+        requestParam.setMethod(HttpMethod.Post);
         Map<String,Object> requestMap=new HashMap<>();
         requestMap.put("project_id",project_id);
         int[] arr = {40004003};
@@ -159,7 +164,7 @@ public class BusinessApplyActivity extends BaseActivity {
             ex.printStackTrace();
         }
 
-        requestParam.setGetRequestMap(requestMap);
+        requestParam.setPostRequestMap(requestMap);
         requestParam.setCallback(new MyCallBack<String>(){
             @Override
             public void onSuccess(String result) {
@@ -168,7 +173,7 @@ public class BusinessApplyActivity extends BaseActivity {
                 //BaseEntity<Integer> entity= JsonParse.parse(result,Integer.class);
                 try {
                     JSONObject jsonobj = new JSONObject(result);
-                    if(jsonobj.getBoolean("status")){
+                    if(jsonobj.getBoolean("Status")){
                         LogUtil.d("申请报告成功"+jsonobj.toString());
                         finish();
                     }else{

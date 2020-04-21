@@ -1,19 +1,13 @@
 package com.findingdata.oabank.utils;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.provider.MediaStore;
-
-import java.io.File;
 
 /**
  * Created by zengx on 2019/11/17.
@@ -95,5 +89,13 @@ public class Utils {
             result = res.getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    public static String dealwithNull(String key){
+        if (key == null){
+            return "";
+        }else {
+            return key;
+        }
     }
 }

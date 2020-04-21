@@ -71,19 +71,20 @@
         android:orientation="horizontal"
         android:layout_marginTop="5dp"
         >
+
         <TextView
             android:id="@+id/project_list_loan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
             android:text="房抵快贷"
-            android:textColor="@color/text_desc"/>
+            android:textColor="@color/text_desc"
+            android:textSize="14sp" />
         <TextView
             android:id="@+id/project_list_contact"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            android:text="李四"
+            android:text=""
             android:textColor="@color/text_desc"/>
         <TextView
             android:id="@+id/project_list_time"

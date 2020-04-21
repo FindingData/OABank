@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -122,6 +123,10 @@ public class ProjectDetailActivity extends BaseActivity {
     private LinearLayout project_detail_ll_note;
     @ViewInject(R.id.project_detail_ll_news)
     private LinearLayout project_detail_ll_news;
+    @ViewInject(R.id.add_note_btn_estimate)
+    private Button add_note_btn_estimate;
+    @ViewInject(R.id.add_note_btn_apply)
+    private Button add_note_btn_apply;
 
 
     @ViewInject(R.id.rlv_image)
@@ -136,7 +141,15 @@ public class ProjectDetailActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         toolbar_tv_title.setText("项目详情");
-        toolbar_btn_action.setVisibility(View.VISIBLE);
+
+        int project_status = getIntent().getExtras().getInt("project_status");
+        if (project_status != 40001003){
+            toolbar_btn_action.setVisibility(View.VISIBLE);
+        }
+        if (project_status != 40001001){
+            add_note_btn_estimate.setVisibility(View.GONE);
+            add_note_btn_apply.setVisibility(View.GONE);
+        }
         project_id=getIntent().getExtras().getInt("project_id");
 
         PermissionsUtils.getInstance().checkPermissions(this, permission, new PermissionsUtils.IPermissionsResult() {
@@ -434,10 +447,19 @@ public class ProjectDetailActivity extends BaseActivity {
     private void showItemDialog() {
         PopupMenu popup = new PopupMenu(this, toolbar_btn_action);
         Menu menu = popup.getMenu();
-        menu.add(0, 2, 2, "项目暂停").setIcon(R.drawable.ic_action_pause_normal);
-        menu.add(0, 3, 3, "项目终止").setIcon(R.drawable.ic_action_stop_normal);
-        menu.add(0, 4, 4, "继续项目").setIcon(R.drawable.ic_action_help);
-        menu.add(0,5,5,"派单").setIcon(R.drawable.ic_action_help);
+        int project_status = getIntent().getExtras().getInt("project_status");
+        if (project_status == 40001006){
+            menu.add(0,5,5,"派单").setIcon(R.drawable.ic_action_help);
+        }else if (project_status == 40001001){
+            menu.add(0, 2, 2, "项目暂停").setIcon(R.drawable.ic_action_pause_normal);
+            menu.add(0, 3, 3, "项目终止").setIcon(R.drawable.ic_action_stop_normal);
+        }else if (project_status == 40001005){
+            menu.add(0, 4, 4, "继续项目").setIcon(R.drawable.ic_action_help);
+        }
+//        menu.add(0, 2, 2, "项目暂停").setIcon(R.drawable.ic_action_pause_normal);
+//        menu.add(0, 3, 3, "项目终止").setIcon(R.drawable.ic_action_stop_normal);
+//        menu.add(0, 4, 4, "继续项目").setIcon(R.drawable.ic_action_help);
+//        menu.add(0,5,5,"派单").setIcon(R.drawable.ic_action_help);
 //        menu.add(0, 5, 5, "改派公司").setIcon(R.drawable.ic_action_todo_normal);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
@@ -502,6 +524,7 @@ public class ProjectDetailActivity extends BaseActivity {
         }else if (action == 5){
             Bundle bundle=new Bundle();
             bundle.putInt("project_id",project_id);
+            bundle.putSerializable("project",projectEntity);
             startActivity(CustomerListActivity.class,bundle);
         }
     }

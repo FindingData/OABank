@@ -2,7 +2,6 @@ package com.findingdata.oabank.utils.http;
 
 import android.util.Log;
 
-import com.findingdata.oabank.base.Config;
 import com.findingdata.oabank.entity.TokenEntity;
 import com.findingdata.oabank.utils.SharedPreferencesManage;
 
@@ -13,10 +12,6 @@ import org.xutils.common.util.LogUtil;
 import org.xutils.http.cookie.DbCookieStore;
 
 import java.net.HttpCookie;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +30,7 @@ public class MyCallBack<ResultType> implements Callback.CommonCallback<ResultTyp
             if(jsonObject.getBoolean("Status")){
                 TokenEntity tokenEntity=SharedPreferencesManage.getToken();
                 if(tokenEntity!=null){
-                    tokenEntity.setExpireTime(new Date().getTime()+10*60*1000-2000);
+                    tokenEntity.setExpireTime(new Date().getTime()+60*60*1000-2000);
                     SharedPreferencesManage.setToken(tokenEntity);
                 }
             }

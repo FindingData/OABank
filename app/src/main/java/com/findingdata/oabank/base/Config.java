@@ -9,8 +9,10 @@ package com.findingdata.oabank.base;
  */
 public class Config {
 
-    public static final String BASE_URL= "http://finding2018.f3322.net:2092";//后台服务地址
-    public static final String OA_BASE_URL = "http://finding2018.f3322.net:52090";
+//    public static final String BASE_URL= "http://finding2018.f3322.net:42092";//后台服务地址
+//    public static final String OA_BASE_URL = "http://finding2018.f3322.net:42090";
+    public static final String BASE_URL= "http://yh.cszfp.net:5813";//后台服务地址
+    public static final String OA_BASE_URL = "http://oa.cszfp.net:5810";
     public static final String COOKIE_NAME="Token";//Cookie名
 
     public static final String SD_APP_DIR_NAME = "OABank"; //存储程序在外部SD卡上的根目录的名字

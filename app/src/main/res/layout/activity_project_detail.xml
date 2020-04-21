@@ -434,6 +434,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
                 <Button
+                    android:visibility="gone"
                     android:id="@+id/add_note_btn_estimate"
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -451,7 +452,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="20dp"
                     android:background="@color/primary"
-                    android:text="申  请"
+                    android:text="申  请  报  告"
                     android:textColor="#fff"
                     android:textSize="16sp"
                     />

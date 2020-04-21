@@ -99,9 +99,22 @@ public class ProjectEntity implements Serializable {
     private int OWNER_CUSTOMER_ID;
     private List<PropertyEntity> PROPERTY_LIST;
     private ProjectBusinessEntity BUSINESS;
+    private List<ProjectBusinessEntity> BUSINESS_LIST;
     private List<ProjectNoteEntity> NOTE_LIST;
     private List<ProjectActionEntity> ACT_LIST;
+    private String SHORT_NAME;
 
+    public List<ProjectBusinessEntity> getBUSINESS_LIST() {return BUSINESS_LIST;}
+
+    public void setBUSINESS_LIST(List<ProjectBusinessEntity> business_list) {this.BUSINESS_LIST = business_list;}
+
+    public String getSHORT_NAME() {
+        return SHORT_NAME;
+    }
+
+    public void setSHORT_NAME(String SHORT_NAME) {
+        this.SHORT_NAME = SHORT_NAME;
+    }
 
     public int getPROJECT_ID() {
         return PROJECT_ID;
