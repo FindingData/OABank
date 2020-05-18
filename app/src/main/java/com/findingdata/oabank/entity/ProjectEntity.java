@@ -69,7 +69,7 @@ public class ProjectEntity implements Serializable {
     private String BCM_PHONE;
     private int LOAN_TYPE;
     private String LOAN_TYPE_CHS;
-    private int LOAN_AMOUNT;
+    private double LOAN_AMOUNT;
     private String BORROWER;
     private String BORROWER_PHONE;
     private String BORROWER_ID_CARD;
@@ -204,11 +204,11 @@ public class ProjectEntity implements Serializable {
         this.LOAN_TYPE_CHS = LOAN_TYPE_CHS;
     }
 
-    public int getLOAN_AMOUNT() {
+    public double getLOAN_AMOUNT() {
         return LOAN_AMOUNT;
     }
 
-    public void setLOAN_AMOUNT(int LOAN_AMOUNT) {
+    public void setLOAN_AMOUNT(double LOAN_AMOUNT) {
         this.LOAN_AMOUNT = LOAN_AMOUNT;
     }
 

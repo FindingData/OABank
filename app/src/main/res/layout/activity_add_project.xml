@@ -141,7 +141,7 @@
             <TextView
                 android:layout_width="140dp"
                 android:layout_height = "wrap_content"
-                android:text = "委托人"
+                android:text = "*委托人"
                 android:textSize = "14sp"></TextView>
 
             <EditText
@@ -157,7 +157,7 @@
             <TextView
                 android:layout_width="140dp"
                 android:layout_height = "wrap_content"
-                android:text = "委托人电话"
+                android:text = "*委托人电话"
                 android:textSize = "14sp"></TextView>
 
             <EditText

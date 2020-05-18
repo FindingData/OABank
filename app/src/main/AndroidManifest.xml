@@ -2,17 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.findingdata.oabank">
-
+    <!-- 必选 -->
     <application
         android:name=".FDApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.AddObjectActivity"></activity>
+        <activity android:name=".ui.SearchEditActivity"></activity>
+        <activity android:name=".ui.AchievementDetailActivity" />
+        <activity android:name=".ui.AchievementListActivity" />
+        <activity android:name=".ui.AddObjectActivity" />
         <activity android:name=".ui.DispatchResultActivity" />
         <activity android:name=".ui.CustomerListActivity" />
         <activity android:name=".ui.BusinessApplyActivity" />
@@ -68,22 +70,21 @@
         <service
             android:name=".receiver.GeTuiIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".receiver.DemoPushService"
             android:exported="true"
             android:label="PushService"
             android:process=":pushservice" />
-    </application> <!-- 必选 -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 必选 -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- 必选 -->
-    <uses-permission android:name="android.permission.CAMERA" /> <!-- 获取网络状态 -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- 网络通信 -->
-    <uses-permission android:name="android.permission.INTERNET" /> <!-- 获取设备信息 -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 获取MAC地址 -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- 允许程序录制音频 -->
+    </application> <!-- 获取网络状态 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 网络通信 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- 获取设备信息 -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- 获取MAC地址 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- 允许程序录制音频 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 支持个推3.0 电子围栏功能 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.BLUETOOTH" /> <!-- 支持个推3.0 电子围栏功能 -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

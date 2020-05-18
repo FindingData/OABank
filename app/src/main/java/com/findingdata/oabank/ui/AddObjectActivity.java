@@ -1,7 +1,9 @@
 package com.findingdata.oabank.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -33,8 +35,8 @@ public class AddObjectActivity extends BaseActivity {
     private TextView delete_object;
     private String property_id;
     private JSONObject property;
+    private TextView toolbar_btn_back;
 
-    private EditText ed_property_name;
     private EditText ed_property_address;
     private EditText ed_property_area;
     private EditText ed_inspection_contact;
@@ -43,8 +45,14 @@ public class AddObjectActivity extends BaseActivity {
     private EditText ed_property_owner_telephone;
     private EditText ed_property_owner_idcard;
     private EditText ed_property_owner_code;
+    private EditText tv_property_loupan;
+    private EditText tv_property_loudong;
+    private EditText tv_property_hu;
+    private String construction_code = "";
+    private String building_code = "";
+    private String house_code = "";
 
-    String pca_code;
+    String pca_code ;
     String property_type;
 
     String[] pca_codes = new String[0];
@@ -61,16 +69,21 @@ public class AddObjectActivity extends BaseActivity {
         save_object.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String type = getIntent().getExtras().getString("type");
-                if (type.equals("add")){
-                    initObject();
+                if (ed_property_address.getText().toString().equals("")){
+                    showToast("请输入抵押物地址");
                 }else{
-                    try {
-                        addProperty(property.getString("PROPERTY_ID"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    String type = getIntent().getExtras().getString("type");
+                    if (type.equals("add")){
+                        initObject();
+                    }else{
+                        try {
+                            addProperty(property.getString("PROPERTY_ID"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
+
             }
         });
         delete_object = findViewById(R.id.delete_object);
@@ -86,16 +99,26 @@ public class AddObjectActivity extends BaseActivity {
             }
         });
 
-        ed_property_name = findViewById(R.id.property_name);
         ed_property_area = findViewById(R.id.property_area);
         ed_property_address = findViewById(R.id.property_address);
         ed_inspection_contact = findViewById(R.id.inspection_contact);
         ed_inspection_contact_phone = findViewById(R.id.inspection_contact_phone);
+        tv_property_loupan = findViewById(R.id.property_loupan);
+        tv_property_loudong = findViewById(R.id.property_loudong);
+        tv_property_hu = findViewById(R.id.property_hu);
 
         ed_property_owner = findViewById(R.id.property_owner);
         ed_property_owner_code = findViewById(R.id.property_owner_code);
         ed_property_owner_idcard = findViewById(R.id.property_owner_idcard);
         ed_property_owner_telephone = findViewById(R.id.property_owner_telephone);
+
+        toolbar_btn_back = findViewById(R.id.toolbar_btn_back);
+        toolbar_btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         String type = getIntent().getExtras().getString("type");
         if (type.equals("add")){
@@ -105,7 +128,69 @@ public class AddObjectActivity extends BaseActivity {
         }
         getPCA();
         getPropertys();
+
+        tv_property_loupan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AddObjectActivity.this,SearchEditActivity.class);
+                intent.putExtra("type","1");
+                intent.putExtra("purpose_id",property_type);
+                startActivityForResult(intent,1);
+            }
+        });
+
+        tv_property_loudong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AddObjectActivity.this,SearchEditActivity.class);
+                intent.putExtra("type","2");
+                intent.putExtra("purpose_id",property_type);
+                intent.putExtra("construction_code",construction_code);
+                startActivityForResult(intent,2);
+            }
+        });
+
+        tv_property_hu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AddObjectActivity.this,SearchEditActivity.class);
+                intent.putExtra("type","3");
+                intent.putExtra("purpose_id",property_type);
+                intent.putExtra("building_code",building_code);
+                startActivityForResult(intent,3);
+            }
+        });
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1) {
+                construction_code = data.getExtras().getString("construction_code");
+                tv_property_loupan.setText(data.getExtras().getString("construction_name"));
+                building_code = "";
+                tv_property_loudong.setText("");
+                house_code = "";
+                tv_property_hu.setText("");
+                ed_property_area.setText("");
+            }else if (requestCode == 2){
+                building_code = data.getExtras().getString("building_code");
+                tv_property_loudong.setText(data.getExtras().getString("building_name"));
+                house_code = "";
+                tv_property_hu.setText("");
+                ed_property_area.setText("");
+            }else if (requestCode == 3){
+                house_code = data.getExtras().getString("house_code");
+                tv_property_hu.setText(data.getExtras().getString("house_name"));
+                ed_property_area.setText(data.getExtras().getString("building_area"));
+            }
+        }
+    }
+
 
     public void getPCA(){
         RequestParam requestParam=new RequestParam();
@@ -259,9 +344,14 @@ public class AddObjectActivity extends BaseActivity {
 
         try {
             property = new JSONObject( getIntent().getExtras().getString("property"));
-            ed_property_name.setText(Utils.dealwithNull(property.getString("PROPERTY_NAME")));
             ed_property_address.setText(Utils.dealwithNull(property.getString("ADDRESS")));
             ed_property_area.setText(Utils.dealwithNull(property.getString("AREA")));
+            tv_property_loupan.setText(Utils.dealwithNull(property.getString("CONSTRUCTION_NAME")));
+            tv_property_loudong.setText(Utils.dealwithNull(property.getString("BUILDING_NAME")));
+            tv_property_hu.setText(Utils.dealwithNull(property.getString("HOUSE_NAME")));
+            construction_code = Utils.dealwithNull(property.getString("CONSTRUCTION_CODE"));
+            building_code = Utils.dealwithNull(property.getString("BUILDING_CODE"));
+            house_code = Utils.dealwithNull(property.getString("HOUSE_CODE"));
             ed_inspection_contact.setText(Utils.dealwithNull(property.getString("INSPECTION_CONTACT")));
             ed_inspection_contact_phone.setText(Utils.dealwithNull(property.getString("INSPECTION_CONTACT_PHONE")));
             ed_property_owner.setText(Utils.dealwithNull(property.getJSONArray("PROPERTY_RIGHTS").getJSONObject(0).getString("PROPERTY_OWNER")));
@@ -277,10 +367,8 @@ public class AddObjectActivity extends BaseActivity {
 
     public void deleteProperty()  {
         RequestParam requestParam=new RequestParam();
-//        requestParam.setUrl(BASE_URL+"/api/Project/GetProjectInfo");
-//        requestParam.setUrl(BASE_URL+"/api/Property/DeleteProperty");
+
         requestParam.setMethod(HttpMethod.Delete);
-//        Map<String,Object> requestMap=new HashMap<>();
         String property_id = "";
         try {
             property_id = property.getString("PROPERTY_ID");
@@ -363,11 +451,15 @@ public class AddObjectActivity extends BaseActivity {
         }
 
     public void addProperty(final String property_id){
-        String property_name = ed_property_name.getText().toString();
+
         String property_address = ed_property_address.getText().toString();
         String property_area = ed_property_area.getText().toString();
         String inspection_contact = ed_inspection_contact.getText().toString();
         String inspection_contact_phone = ed_inspection_contact_phone.getText().toString();
+        String loupan = tv_property_loupan.getText().toString();
+        String loudong = tv_property_loudong.getText().toString();
+        String hu = tv_property_hu.getText().toString();
+        String property_name = Utils.dealwithNull(loupan)+Utils.dealwithNull(loudong)+Utils.dealwithNull(hu);
 
         RequestParam requestParam=new RequestParam();
 //        requestParam.setUrl(BASE_URL+"/api/Project/GetProjectInfo");
@@ -384,6 +476,12 @@ public class AddObjectActivity extends BaseActivity {
         requestMap.put("INSPECTION_CONTACT",inspection_contact);
         requestMap.put("INSPECTION_CONTACT_PHONE",inspection_contact_phone);
         requestMap.put("AREA",property_area);
+        requestMap.put("CONSTRUCTION_NAME",loupan);
+        requestMap.put("CONSTRUCTION_CODE",construction_code);
+        requestMap.put("BUILDING_NAME",loudong);
+        requestMap.put("BUILDING_CODE",building_code);
+        requestMap.put("HOUSE_NAME",hu);
+        requestMap.put("HOUSE_CODE",house_code);
         requestParam.setPostRequestMap(requestMap);
         requestParam.setCallback(new MyCallBack<String>(){
             @Override

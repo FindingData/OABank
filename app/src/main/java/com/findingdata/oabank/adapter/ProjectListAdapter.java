@@ -28,11 +28,19 @@ public class ProjectListAdapter extends BaseQuickAdapter<ProjectEntity, BaseView
         String aplication_type = "";
         for (int i = 0; i<business_list.size();i++){
             if (business_list.get(i).getBUSINESS_TYPE() == 40004002){
-                if (!aplication_type.contains("预"))
+                if (!aplication_type.contains("预")){
                     aplication_type += "预 ";
+                }else{
+
+                }
+
             }else {
-                if (!aplication_type.contains("报"))
+                if (!aplication_type.contains("报")){
                     aplication_type += "报 ";
+                }else{
+
+                }
+
             }
         }
         helper.setText(R.id.project_list_type,aplication_type);
@@ -42,10 +50,13 @@ public class ProjectListAdapter extends BaseQuickAdapter<ProjectEntity, BaseView
             helper.setText(R.id.project_list_price,Utils.dealwithNull(item.getLOAN_AMOUNT()+"万"));
         }else{
             helper.setText(R.id.project_list_client,Utils.dealwithNull(business_list.get(0).getCOMMISSIONED_NAME()));
-            if (business_list.get(0).getTOTAL_PRICE()!=0)
+            if (business_list.get(0).getTOTAL_PRICE()!=0){
                 helper.setText(R.id.project_list_price,Utils.dealwithNull(business_list.get(0).getTOTAL_PRICE()+"万"));
-        }
+            }else{
+                helper.setText(R.id.project_list_price,"");
+            }
 
+        }
 
         helper.setText(R.id.project_list_loan,Utils.dealwithNull(item.getLOAN_TYPE_CHS()));
         helper.setText(R.id.project_list_contact,"    "+Utils.dealwithNull(item.getBORROWER()));

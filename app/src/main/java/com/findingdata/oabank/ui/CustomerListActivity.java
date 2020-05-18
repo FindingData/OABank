@@ -11,6 +11,7 @@ import com.findingdata.oabank.entity.CustomerEntity;
 import com.findingdata.oabank.entity.ProjectBusinessEntity;
 import com.findingdata.oabank.entity.ProjectEntity;
 import com.findingdata.oabank.utils.LogUtils;
+import com.findingdata.oabank.utils.Utils;
 import com.findingdata.oabank.utils.http.HttpMethod;
 import com.findingdata.oabank.utils.http.MyCallBack;
 import com.findingdata.oabank.utils.http.RequestParam;
@@ -51,10 +52,12 @@ public class CustomerListActivity extends BaseActivity {
     private CustomerListAdapter adapter;
     private ProjectEntity project;
 
-    private int position;
+    private int position = -1;
 
     @ViewInject(R.id.submit)
     private TextView submit;
+    @ViewInject(R.id.toolbar_btn_back)
+    private TextView toolbar_btn_back;
 
 
     @Override
@@ -78,8 +81,18 @@ public class CustomerListActivity extends BaseActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                position = adapter.getMposition();
+                if(position != -1){
+                    manualDipatch();
+                }
 
-                manualDipatch();
+            }
+        });
+        toolbar_btn_back.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
     }
@@ -212,12 +225,12 @@ public class CustomerListActivity extends BaseActivity {
                         LogUtil.d("评估公司列表"+jsonobj.toString());
                         JSONArray jsonArray = jsonobj.getJSONArray("Result");
                         for (int i = 0; i<jsonArray.length(); i++){
-                            if(Arrays.asList(business_commissionid).contains(jsonArray.getJSONObject(i).getString("CUSTOMER_ID"))){
+                            if(!Arrays.asList(business_commissionid).contains(jsonArray.getJSONObject(i).getString("CUSTOMER_ID"))){
                                 CustomerEntity customerEntity = new CustomerEntity();
                                 customerEntity.setCUSTOMER_ID(jsonArray.getJSONObject(i).getInt("CUSTOMER_ID"));
-                                customerEntity.setCUSTOMER_NAME(jsonArray.getJSONObject(i).getString("CUSTOMER_NAME"));
+                                customerEntity.setCUSTOMER_NAME(jsonArray.getJSONObject(i).getString("SHORT_NAME"));
                                 customerEntity.setBUSINESS_CONTACT(jsonArray.getJSONObject(i).getString("BUSINESS_CONTACT"));
-                                customerEntity.setPHONE(jsonArray.getJSONObject(i).getString("PHONE"));
+                                customerEntity.setPHONE(Utils.dealwithNull(jsonArray.getJSONObject(i).getString("PHONE")));
                                 customerEntity.setPROCESSING(jsonArray.getJSONObject(i).getInt("PROCESSING"));
                                 customerEntity.setTOTAL(jsonArray.getJSONObject(i).getInt("TOTAL"));
                                 mList.add(customerEntity);

@@ -10,13 +10,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView
-            android:id="@+id/project_note_create"
+            android:id="@+id/project_note_customer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="13sp"
             android:textColor="@color/text_desc"/>
         <TextView
-            android:id="@+id/project_note_customer"
+            android:id="@+id/project_note_create"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"

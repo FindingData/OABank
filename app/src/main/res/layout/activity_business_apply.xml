@@ -207,7 +207,7 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -216,7 +216,19 @@
             android:paddingRight="10dp"
             android:id = "@+id/property_list">
 
-        </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:id = "@+id/property_area"></TextView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:id = "@+id/property_price"></TextView>
+
+        </RelativeLayout>
 
     </LinearLayout>
 

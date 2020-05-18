@@ -14,8 +14,10 @@ import com.findingdata.oabank.adapter.PropertyListAdapter;
 import com.findingdata.oabank.base.BaseActivity;
 import com.findingdata.oabank.entity.ApplyBusiness;
 import com.findingdata.oabank.entity.FormLabelData;
+import com.findingdata.oabank.entity.LabelKeyValue;
 import com.findingdata.oabank.entity.PropertyEntity;
 import com.findingdata.oabank.utils.LogUtils;
+import com.findingdata.oabank.utils.SharedPreferencesManage;
 import com.findingdata.oabank.utils.http.HttpMethod;
 import com.findingdata.oabank.utils.http.MyCallBack;
 import com.findingdata.oabank.utils.http.RequestParam;
@@ -42,6 +44,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.findingdata.oabank.base.Config.BASE_URL;
 import static com.findingdata.oabank.base.Config.OA_BASE_URL;
+import static com.findingdata.oabank.base.Config.OA_COMPANY_ID;
+import static com.findingdata.oabank.base.Config.OA_DYNAMIC_ID;
 
 /**
  * Created by Loong on 2019/11/25.
@@ -104,41 +108,48 @@ public class AddProjectActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (property_list != null && property_list.length()>0){
-                    if (formContentValue.length()>0){
-                        try {
-                            JSONArray jsonarray = new JSONArray();
-                            for (int i = 0; i<formContentValue.length(); i++) {
-                                JSONObject dic_obj = new JSONObject();
+                    if (weituoren.getText().toString() != null && !weituoren.getText().toString().equals("") && weituorendianhua.getText().toString()!= null && !weituorendianhua.getText().toString().equals("")){
+                        if (formContentValue.length()>0){
+                            try {
+                                List<LabelKeyValue> jsonarray = new ArrayList<LabelKeyValue>();
+                                for (int i = 0; i<formContentValue.length(); i++) {
+                                    LabelKeyValue dic_obj  = new LabelKeyValue();
 
-                                dic_obj.put("ID", formContentValue.getJSONObject(i).getString("LABEL_ID"));
-                                if (i == 0) {
-                                    dic_obj.put("VALUE", project_type);
-                                } else if (i == 1) {
-                                    dic_obj.put("VALUE", loan_type);
-                                } else if (i == 2) {
-                                    dic_obj.put("VALUE", loan_money.getText().toString());
-                                } else if (i == 3) {
-                                    dic_obj.put("VALUE", jiekuanren.getText().toString());
-                                } else if (i == 4) {
-                                    dic_obj.put("VALUE", jiekuanrendianhua.getText().toString());
-                                } else if (i == 5) {
-                                    dic_obj.put("VALUE", weituoren.getText().toString());
-                                } else if (i == 6) {
-                                    dic_obj.put("VALUE", weituorendianhua.getText().toString());
+                                    dic_obj.setID(formContentValue.getJSONObject(i).getString("LABEL_ID"));
+                                    if (i == 0) {
+                                        dic_obj.setVALUE( project_type);
+                                    } else if (i == 1) {
+                                        dic_obj.setVALUE( loan_type);
+                                    } else if (i == 2) {
+                                        dic_obj.setVALUE( loan_money.getText().toString());
+                                    } else if (i == 3) {
+                                        dic_obj.setVALUE( jiekuanren.getText().toString());
+                                    } else if (i == 4) {
+                                        dic_obj.setVALUE( jiekuanrendianhua.getText().toString());
+                                    } else if (i == 5) {
+                                        dic_obj.setVALUE( weituoren.getText().toString());
+                                    } else if (i == 6) {
+                                        dic_obj.setVALUE( weituorendianhua.getText().toString());
+                                    } else if (i == 7) {
+                                        dic_obj.setVALUE( SharedPreferencesManage.getUserInfo().getUserId()+"");
+                                    }
+                                    jsonarray.add(dic_obj);
                                 }
-                                jsonarray.put(dic_obj);
+                                Map<String,Object> requestMap=new HashMap<>();
+                                requestMap.put("labelKeyValueList",jsonarray);
+                                requestMap.put("FORM_ID",formid);
+                                requestMap.put("formStoreID",project.getString("PROJECT_FORM_ID"));
+                                BankSaveFormData(requestMap);
+
+                            }  catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                            Map<String,Object> requestMap=new HashMap<>();
-                            requestMap.put("labelKeyValueList",jsonarray);
-                            requestMap.put("FORM_ID",formid);
-                            requestMap.put("formStoreID",project.getString("PROJECT_FORM_ID"));
-                            BankSaveFormData(requestMap);
 
-                        }  catch (JSONException e) {
-                            e.printStackTrace();
                         }
-
+                    }else{
+                        showToast("请填写委托人和委托人电话");
                     }
+
                 }else{
                     showToast("请添加抵押物");
                 }
@@ -151,7 +162,6 @@ public class AddProjectActivity extends BaseActivity {
         jiekuanrendianhua = findViewById(R.id.jiekuanrendianhua);
         weituoren = findViewById(R.id.weituoren);
         weituorendianhua = findViewById(R.id.weituorendianhua);
-
     }
 
     @Override
@@ -196,7 +206,7 @@ public class AddProjectActivity extends BaseActivity {
                         jsonarray.add(jsonobj);
                         jsonobj = new FormLabelData();
                         jsonobj.setKey("project_name");
-                        jsonobj.setValue(property_list.getJSONObject(0).getString("PROPERTY_NAME"));
+                        jsonobj.setValue(property_list.getJSONObject(0).getString("ADDRESS"));
                         jsonarray.add(jsonobj);
 
                         for (int i = 0; i<formContentValue.length(); i++){
@@ -217,6 +227,8 @@ public class AddProjectActivity extends BaseActivity {
                                     jsonobj.setValue( weituoren.getText().toString());
                                 } else if (i == 6) {
                                     jsonobj.setValue( weituorendianhua.getText().toString());
+                                }else if (i == 7) {
+                                    jsonobj.setValue( SharedPreferencesManage.getUserInfo().getUserId()+"");
                                 }
                                 jsonarray.add(jsonobj);
                             }
@@ -302,7 +314,7 @@ public class AddProjectActivity extends BaseActivity {
                     if (jsonObject.getBoolean("Status")){
                         if (jsonObject.getJSONObject("Result").getBoolean("IS_AUTO_DISPATCH")){
                             Map<String,Object> jsonObject1 = new HashMap<>();
-                            jsonObject1.put("PROJECT_NAME",property_list.getJSONObject(0).getString("PROPERTY_NAME"));
+                            jsonObject1.put("PROJECT_NAME",property_list.getJSONObject(0).getString("ADDRESS"));
                             jsonObject1.put("PRIORITY_LEVEL",40052001);
                             jsonObject1.put("PROJECT_TYPE","");
                             jsonObject1.put("APPRAISAL_PURPOSE",40005001);
@@ -311,7 +323,9 @@ public class AddProjectActivity extends BaseActivity {
                             jsonObject1.put("DUE_DATE","");
                             jsonObject1.put("IS_APPROVED",0);
                             jsonObject1.put("BUSINESS_FORM_ID",project_form_id);
-                            jsonObject1.put("PROPERTY_LIST",property_list);
+                            Gson gson = new Gson();
+                            Type type = new TypeToken<List<PropertyEntity>>() {}.getType();
+                            jsonObject1.put("PROPERTY_LIST",gson.fromJson(property_list.toString(),type));
                             jsonObject1.put("BUSINESS_LIST",new int[]{40004001, 40004002});
                             jsonObject1.put("REQUIRE_ESTIMATE",0);
                             jsonObject1.put("REQUIRED_AUDIT",0);
@@ -459,8 +473,8 @@ public class AddProjectActivity extends BaseActivity {
         requestParam.setUrl(OA_BASE_URL+"/DynamicForm/BankGetFormListByCompanyId");
         requestParam.setMethod(HttpMethod.Get);
         Map<String,Object> requestMap=new HashMap<>();
-        requestMap.put("formType","1");
-        requestMap.put("companyID","3");
+        requestMap.put("formType",OA_DYNAMIC_ID);
+        requestMap.put("companyID",OA_COMPANY_ID);
         requestParam.setGetRequestMap(requestMap);
         requestParam.setCallback(new MyCallBack<String>(){
             @Override
@@ -518,6 +532,8 @@ public class AddProjectActivity extends BaseActivity {
                                 value = "430100";
                             }else if (dataArray.getJSONObject(i).getString("LABEL_NAME").equals("customer_id")){
                                 value = "3";
+                            }else if (dataArray.getJSONObject(i).getString("LABEL_NAME").equals("bcm_user_id")){
+                                value = SharedPreferencesManage.getUserInfo().getUserId()+"";
                             }
                             JSONObject jsonObject1 = new JSONObject();
                             jsonObject1.put("LABEL_ID",dataArray.getJSONObject(i).getString("FORM_LABEL_ID"));

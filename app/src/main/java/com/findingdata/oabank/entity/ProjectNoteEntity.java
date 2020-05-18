@@ -29,6 +29,8 @@ public class ProjectNoteEntity implements Serializable {
     private String CREATE_NAME;
     private String CREATE_TIME;
     private int IS_DELETED;
+    private int IS_OUTSIDE;
+
 
     public int getPROJECT_NOTE_ID() {
         return PROJECT_NOTE_ID;
@@ -92,5 +94,13 @@ public class ProjectNoteEntity implements Serializable {
 
     public void setIS_DELETED(int IS_DELETED) {
         this.IS_DELETED = IS_DELETED;
+    }
+
+    public int getIS_OUTSIDE() {
+        return IS_OUTSIDE;
+    }
+
+    public void setIS_OUTSIDE(int IS_OUTSIDE) {
+        this.IS_OUTSIDE = IS_OUTSIDE;
     }
 }

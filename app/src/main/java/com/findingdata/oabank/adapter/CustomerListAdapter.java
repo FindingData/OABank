@@ -86,4 +86,8 @@ public class CustomerListAdapter extends RecyclerView.Adapter<CustomerListAdapte
 
         }
     }
+
+    public int getMposition(){
+        return mposition;
+    }
 }

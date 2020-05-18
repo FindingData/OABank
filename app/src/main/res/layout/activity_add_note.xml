@@ -30,4 +30,33 @@
         android:textColor="#fff"
         android:textSize="16sp"
         />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id = "@+id/add_btn_note">
+        <Button
+            android:id="@+id/add_to_yh"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:background="@color/primary"
+            android:text="给银行留言"
+            android:textColor="#fff"
+            android:textSize="16sp"
+            />
+
+        <Button
+            android:id="@+id/add_to_pg"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:background="@color/primary"
+            android:text="给评估公司留言"
+            android:textColor="#fff"
+            android:textSize="16sp"
+            />
+    </LinearLayout>
 </LinearLayout>

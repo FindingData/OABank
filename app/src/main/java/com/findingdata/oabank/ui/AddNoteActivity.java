@@ -4,7 +4,9 @@ package com.findingdata.oabank.ui;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.findingdata.oabank.R;
@@ -37,6 +39,11 @@ public class AddNoteActivity extends BaseActivity {
     private TextView toolbar_tv_title;
     @ViewInject(R.id.add_note_et_content)
     private EditText add_note_et_content;
+    @ViewInject(R.id.add_note_btn_save)
+    private Button add_note_btn_save;
+
+    @ViewInject(R.id.add_btn_note)
+    private LinearLayout add_btn_note;
 
     private int project_id;
     private int actionid;
@@ -48,15 +55,22 @@ public class AddNoteActivity extends BaseActivity {
         actionid = getIntent().getExtras().getInt("actionid");
         if (actionid == 1){
             toolbar_tv_title.setText("备注");
+            add_note_btn_save.setVisibility(View.GONE);
+            add_btn_note.setVisibility(View.VISIBLE);
+
         }else if (actionid == 2){
             toolbar_tv_title.setText("暂停项目");
+            add_btn_note.setVisibility(View.GONE);
+            add_note_btn_save.setVisibility(View.VISIBLE);
         }else if (actionid == 3){
             toolbar_tv_title.setText("终止项目");
+            add_btn_note.setVisibility(View.GONE);
+            add_note_btn_save.setVisibility(View.VISIBLE);
         }
 
     }
 
-    @Event({R.id.toolbar_btn_back,R.id.add_note_btn_save})
+    @Event({R.id.toolbar_btn_back,R.id.add_note_btn_save,R.id.add_to_yh,R.id.add_to_pg})
     private void onClickEvent(View v){
         switch (v.getId()){
             case R.id.toolbar_btn_back:
@@ -68,25 +82,42 @@ public class AddNoteActivity extends BaseActivity {
                     showToast("内容不能为空");
                     return;
                 }
-                if (actionid == 1){
-                    addNote();
-                }else if (actionid == 2){
+                if (actionid == 2){
                     modifyProjectStatus("40001005");
                 }else if (actionid ==3){
                     modifyProjectStatus("40001003");
                 }
 
                 break;
+
+            case R.id.add_to_yh:
+                KeyBoardUtils.hideSoftInputMode(this, getWindow().peekDecorView());
+                if(TextUtils.isEmpty(add_note_et_content.getText().toString().trim())){
+                    showToast("内容不能为空");
+                    return;
+                }
+                addNote("0");
+                break;
+            case R.id.add_to_pg:
+                KeyBoardUtils.hideSoftInputMode(this, getWindow().peekDecorView());
+                if(TextUtils.isEmpty(add_note_et_content.getText().toString().trim())){
+                    showToast("内容不能为空");
+                    return;
+                }
+                addNote("1");
+                break;
+
         }
     }
 
-    private void addNote(){
+    private void addNote(String is_outside){
         RequestParam requestParam=new RequestParam();
         requestParam.setUrl(BASE_URL+"/api/project/AddProjectNote");
         requestParam.setMethod(HttpMethod.Post);
         Map<String,Object> requestMap=new HashMap<>();
         requestMap.put("PROJECT_ID",project_id);
         requestMap.put("PROJECT_NOTE_CONTENT",add_note_et_content.getText());
+        requestMap.put("IS_OUTSIDE",is_outside);
         requestParam.setPostRequestMap(requestMap);
         requestParam.setCallback(new MyCallBack<String>(){
             @Override

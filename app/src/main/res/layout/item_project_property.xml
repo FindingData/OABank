@@ -138,4 +138,28 @@
         </RelativeLayout>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id = "@+id/property_asse"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="left"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="评估结果: "
+            android:textSize="13sp"
+            android:textColor="@color/text_desc"/>
+        <TextView
+            android:id="@+id/project_property_assessing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="@color/text_primary"/>
+
+
+    </LinearLayout>
 </LinearLayout>

@@ -30,7 +30,7 @@ public class MyCallBack<ResultType> implements Callback.CommonCallback<ResultTyp
             if(jsonObject.getBoolean("Status")){
                 TokenEntity tokenEntity=SharedPreferencesManage.getToken();
                 if(tokenEntity!=null){
-                    tokenEntity.setExpireTime(new Date().getTime()+6*60*60*1000-2000);
+                    tokenEntity.setExpireTime(new Date().getTime()+60*60*1000-2000);
                     SharedPreferencesManage.setToken(tokenEntity);
                 }
             }

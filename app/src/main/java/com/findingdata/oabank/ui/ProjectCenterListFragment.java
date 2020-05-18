@@ -110,6 +110,14 @@ public class ProjectCenterListFragment extends BaseFragment implements SwipeRefr
                 Bundle bundle=new Bundle();
                 bundle.putInt("project_id",dataList.get(position).getPROJECT_ID());
                 bundle.putInt("project_status",listType);
+                int length = dataList.get(position).getBUSINESS_LIST().size();
+                int flag = 0;
+                for (int i = 0; i<length; i++){
+                    if (dataList.get(position).getBUSINESS_LIST().get(i).getBUSINESS_TYPE() == 40004003){
+                        flag = 1;
+                    }
+                }
+                bundle.putInt("flag",flag);
                 startActivity(ProjectDetailActivity.class,bundle);
             }
         });

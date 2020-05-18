@@ -31,6 +31,7 @@ import com.findingdata.oabank.entity.ProjectCenterListType;
 import com.findingdata.oabank.entity.ProjectEntity;
 import com.findingdata.oabank.entity.ProjectNoteEntity;
 import com.findingdata.oabank.entity.PropertyEntity;
+import com.findingdata.oabank.entity.PropertyPriceEntity;
 import com.findingdata.oabank.utils.FilePathUtil;
 import com.findingdata.oabank.utils.LogUtils;
 import com.findingdata.oabank.utils.PermissionsUtils;
@@ -191,7 +192,7 @@ public class ProjectDetailActivity extends BaseActivity {
         NoUnderlineSpan mNoUnderlineSpan = new NoUnderlineSpan();
         project_detail_tv_id.setText(projectEntity.getPROJECT_ID()+"");
         project_detail_tv_load_type.setText(projectEntity.getLOAN_TYPE_CHS());
-        project_detail_tv_load_price.setText(projectEntity.getLOAN_AMOUNT()+"");
+        project_detail_tv_load_price.setText(projectEntity.getLOAN_AMOUNT()+"万元");
         project_detail_tv_loader.setText(projectEntity.getBORROWER());
         if (!TextUtils.isEmpty(projectEntity.getBORROWER_PHONE())) {
             project_detail_tv_loader_tel.setText(projectEntity.getBORROWER_PHONE());
@@ -250,7 +251,7 @@ public class ProjectDetailActivity extends BaseActivity {
             property_contact.setText(property.getINSPECTION_CONTACT());
             TextView property_contact_tel=v.findViewById(R.id.project_property_contact_tel);
             if(!TextUtils.isEmpty(property.getINSPECTION_CONTACT())){
-                property_contact_tel.setText(property.getINSPECTION_CONTACT());
+                property_contact_tel.setText(property.getINSPECTION_CONTACT_PHONE());
                 if (property_contact_tel.getText() instanceof Spannable) {
                     Spannable s = (Spannable) property_contact_tel.getText();
                     s.setSpan(mNoUnderlineSpan, 0, s.length(), Spanned.SPAN_MARK_MARK);
@@ -270,6 +271,27 @@ public class ProjectDetailActivity extends BaseActivity {
             }else{
                 property_owner_tel.setVisibility(View.GONE);
             }
+            TextView property_assessing = v.findViewById(R.id.project_property_assessing);
+            List<PropertyPriceEntity> list_property_price = new ArrayList<PropertyPriceEntity>();
+            list_property_price = property.getPROPERTY_PRICES();
+            List<String> prices = new ArrayList<String>();
+            for (int j = 0; j<list_property_price.size(); j++){
+                String price = list_property_price.get(j).getREPLY_NAME() + "("+list_property_price.get(j).getREPLY_PHONE()+") ["+list_property_price.get(j).getPRICE_TYPE_CHS()+"] "+list_property_price.get(j).getTOTAL_PRICE()+"万元";
+                prices.add(price);
+            }
+            String pricecontent = "";
+            for (int j = 0; j<prices.size();j++){
+                if (j!=prices.size()-1){
+                    pricecontent = pricecontent + prices.get(j) + "\r\n";
+                }else {
+                    pricecontent = pricecontent + prices.get(j);
+                }
+            }
+            if (prices.size()>0){
+                LinearLayout linearLayout = v.findViewById(R.id.property_asse);
+                linearLayout.setVisibility(View.VISIBLE);
+            }
+            property_assessing.setText(pricecontent);
             ImageButton button=v.findViewById(R.id.project_property_upload);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -307,9 +329,14 @@ public class ProjectDetailActivity extends BaseActivity {
             ProjectNoteEntity note=projectNoteEntities.get(i);
             View v= LayoutInflater.from(this).inflate(R.layout.item_project_note,null);
             TextView note_create=v.findViewById(R.id.project_note_create);
+            String outside = "";
+            if (note.getIS_OUTSIDE() == 0){
+                outside = " （内部备注）";
+            }
             note_create.setText(note.getCREATE_NAME());
             TextView note_customer=v.findViewById(R.id.project_note_customer);
-            note_customer.setText("["+note.getCUSTOMER_NAME()+"]");
+
+            note_customer.setText("["+note.getCUSTOMER_NAME()+"]"+outside);
             TextView note_time=v.findViewById(R.id.project_note_time);
             String time=Utils.transformIOSTime(note.getCREATE_TIME());
             note_time.setText(time.substring(5,17));
@@ -422,12 +449,20 @@ public class ProjectDetailActivity extends BaseActivity {
                 startActivity(AddNoteActivity.class,bundle);
                 break;
             case R.id.add_note_btn_apply:
-                Bundle bundle1=new Bundle();
-                bundle1.putInt("project_id",project_id);
-                startActivity(BusinessApplyActivity.class,bundle1);
+                int flag = getIntent().getExtras().getInt("flag");
+                if (flag == 1){
+                    showToast("已申请过正式报告");
+                }else{
+                    Bundle bundle1=new Bundle();
+                    bundle1.putInt("project_id",project_id);
+                    startActivity(BusinessApplyActivity.class,bundle1);
+                }
+
                 break;
             case R.id.add_note_btn_estimate:
-                showToast("评估成果");
+                Bundle bundle1 = new Bundle();
+                bundle1.putInt("project_id",project_id);
+                startActivity(AchievementListActivity.class,bundle1);
                 break;
             case R.id.toolbar_btn_action:
                 showItemDialog();
@@ -451,7 +486,8 @@ public class ProjectDetailActivity extends BaseActivity {
         Menu menu = popup.getMenu();
         int project_status = getIntent().getExtras().getInt("project_status");
         if (project_status == 40001006){
-            menu.add(0,5,5,"派单").setIcon(R.drawable.ic_action_help);
+            menu.add(0,5,1,"派单").setIcon(R.drawable.ic_action_help);
+            menu.add(0, 3, 3, "项目终止").setIcon(R.drawable.ic_action_stop_normal);
         }else if (project_status == 40001001){
             menu.add(0, 2, 2, "项目暂停").setIcon(R.drawable.ic_action_pause_normal);
             menu.add(0, 3, 3, "项目终止").setIcon(R.drawable.ic_action_stop_normal);

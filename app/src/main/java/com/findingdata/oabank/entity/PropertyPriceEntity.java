@@ -44,7 +44,7 @@ public class PropertyPriceEntity implements Serializable {
     private int PROJECT_ID;
     private String PRICE_TYPE_CHS;
     private String PROPERTY_NAME;
-    private int AREA;
+    private double AREA;
     private int IS_CONFIRM;
     private String REPLY_TIME;
     private int REPLY_BY;
@@ -129,11 +129,11 @@ public class PropertyPriceEntity implements Serializable {
         this.PROPERTY_NAME = PROPERTY_NAME;
     }
 
-    public int getAREA() {
+    public double getAREA() {
         return AREA;
     }
 
-    public void setAREA(int AREA) {
+    public void setAREA(double AREA) {
         this.AREA = AREA;
     }
 
