@@ -33,4 +33,12 @@ public class TokenEntity implements Serializable {
     public void setExpireTime(long expireTime) {
         this.expireTime = expireTime;
     }
+
+    @Override
+    public String toString() {
+        return "TokenEntity{" +
+                "token='" + token + '\'' +
+                ", expireTime=" + expireTime +
+                '}';
+    }
 }

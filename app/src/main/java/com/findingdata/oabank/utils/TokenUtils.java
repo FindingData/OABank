@@ -26,6 +26,7 @@ public class TokenUtils {
     public static boolean isTokenValid(){
         TokenEntity tokenEntity = SharedPreferencesManage.getToken();
         if(tokenEntity!=null){
+            LogUtils.d(tokenEntity.toString());
             return tokenEntity.getExpireTime()>new Date().getTime();
 
         }
@@ -77,6 +78,8 @@ public class TokenUtils {
                 if(entity.isStatus()){
                     SharedPreferencesManage.setToken(new TokenEntity(entity.getResult(),new Date().getTime()+10*60*1000));
                     listener.success();
+                }else{
+                    listener.fail(entity.getMessage());
                 }
             }
 
