@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.findingdata.oabank.base.Config.BASE_URL;
+import static com.findingdata.oabank.base.Config.OA_BASE_URL;
 
 @ContentView(R.layout.activity_business_apply)
 public class BusinessApplyActivity extends BaseActivity {
@@ -174,6 +175,57 @@ public class BusinessApplyActivity extends BaseActivity {
     private void applyProject(){
         RequestParam requestParam=new RequestParam();
         requestParam.setUrl(BASE_URL+"/api/project/ApplyProjectBusiness");
+        requestParam.setMethod(HttpMethod.Post);
+        Map<String,Object> requestMap=new HashMap<>();
+        requestMap.put("project_id",project_id);
+        int[] arr = {40004003};
+        requestMap.put("business_list",arr);
+        try{
+            requestMap.put("commissioned_id",project.getJSONObject("BUSINESS").getString("COMMISSIONED_ID"));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        requestParam.setPostRequestMap(requestMap);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                //BaseEntity<Integer> entity= JsonParse.parse(result,Integer.class);
+                try {
+                    JSONObject jsonobj = new JSONObject(result);
+                    if(jsonobj.getBoolean("Status")){
+//                        LogUtil.d("申请报告成功"+jsonobj.toString());
+//                        finish();
+                        applyProjectToOA();
+                    }else{
+                        showToast("申请失败");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    private void applyProjectToOA(){
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(OA_BASE_URL+"/project/BankAddReportTask");
         requestParam.setMethod(HttpMethod.Post);
         Map<String,Object> requestMap=new HashMap<>();
         requestMap.put("project_id",project_id);

@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.findingdata.oabank.base.Config.BASE_URL;
+import static com.findingdata.oabank.base.Config.OA_BASE_URL;
 
 @ContentView(R.layout.activity_add_note)
 public class AddNoteActivity extends BaseActivity {
@@ -47,12 +48,14 @@ public class AddNoteActivity extends BaseActivity {
 
     private int project_id;
     private int actionid;
+    private int commissioned_id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         project_id=getIntent().getExtras().getInt("project_id");
         actionid = getIntent().getExtras().getInt("actionid");
+        commissioned_id = getIntent().getExtras().getInt("commissioned_id");
         if (actionid == 1){
             toolbar_tv_title.setText("备注");
             add_note_btn_save.setVisibility(View.GONE);
@@ -110,7 +113,7 @@ public class AddNoteActivity extends BaseActivity {
         }
     }
 
-    private void addNote(String is_outside){
+    private void addNote(final String is_outside){
         RequestParam requestParam=new RequestParam();
         requestParam.setUrl(BASE_URL+"/api/project/AddProjectNote");
         requestParam.setMethod(HttpMethod.Post);
@@ -129,6 +132,49 @@ public class AddNoteActivity extends BaseActivity {
                     LogUtil.d("留言ID"+entity.getResult());
                     EventBus.getDefault().post(new EventBusMessage<>("AddNote"));
                     //AddNoteActivity.this.finish();
+//                    finish();
+                    if(is_outside.equals("1")){
+                        addNoteToOA();
+                    }else{
+                        finish();
+                    }
+
+                }else{
+                    showToast(entity.getMessage());
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    private void addNoteToOA(){
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(OA_BASE_URL+"/project/BankProejctNote");
+        requestParam.setMethod(HttpMethod.Post);
+        Map<String,Object> requestMap=new HashMap<>();
+        requestMap.put("PROJECT_ID",project_id);
+        requestMap.put("REMARK",add_note_et_content.getText());
+        requestMap.put("COMMISSIONED_ID",commissioned_id);
+        requestParam.setPostRequestMap(requestMap);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                BaseEntity<Integer> entity= JsonParse.parse(result,Integer.class);
+                if(entity.isStatus()){
                     finish();
                 }else{
                     showToast(entity.getMessage());
@@ -150,7 +196,7 @@ public class AddNoteActivity extends BaseActivity {
         sendRequest(requestParam,true);
     }
 
-    private void modifyProjectStatus(String statusVal){
+    private void modifyProjectStatus(final String statusVal){
         RequestParam requestParam=new RequestParam();
         requestParam.setUrl(BASE_URL+"/api/project/ModifyProjectStatus");
         requestParam.setMethod(HttpMethod.Post);
@@ -158,6 +204,54 @@ public class AddNoteActivity extends BaseActivity {
         requestMap.put("PROJECT_ID",project_id);
         requestMap.put("project_status",statusVal);
         requestMap.put("TERMINATION_REASON",add_note_et_content.getText());
+        requestParam.setPostRequestMap(requestMap);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                //BaseEntity<Integer> entity= JsonParse.parse(result,Integer.class);
+                try {
+                    JSONObject jsonobj = new JSONObject(result);
+                    if(jsonobj.getBoolean("Status")){
+                        LogUtil.d("暂停项目"+jsonobj.toString());
+                        //EventBus.getDefault().post(new EventBusMessage<>("AddNote"));
+                        //AddNoteActivity.this.finish();
+                        //finish();
+                        modifyProjectStatusToOA(statusVal);
+                    }else{
+                        showToast(jsonobj.getString("Message"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    private void modifyProjectStatusToOA(String statusVal){
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(OA_BASE_URL+"/project/BankUpdateProjectStatus");
+        requestParam.setMethod(HttpMethod.Post);
+        Map<String,Object> requestMap=new HashMap<>();
+        requestMap.put("PROJECT_ID",project_id);
+        requestMap.put("project_status",statusVal);
+        requestMap.put("TERMINATION_REASON",add_note_et_content.getText());
+        requestMap.put("COMMISSIONED_ID",commissioned_id);
         requestParam.setPostRequestMap(requestMap);
         requestParam.setCallback(new MyCallBack<String>(){
             @Override

@@ -75,6 +75,7 @@ import top.zibin.luban.Luban;
 import top.zibin.luban.OnCompressListener;
 
 import static com.findingdata.oabank.base.Config.BASE_URL;
+import static com.findingdata.oabank.base.Config.OA_BASE_URL;
 import static com.findingdata.oabank.base.Config.PHOTO_DIR_NAME;
 import static com.findingdata.oabank.base.Config.SD_APP_DIR_NAME;
 
@@ -446,6 +447,7 @@ public class ProjectDetailActivity extends BaseActivity {
                 Bundle bundle=new Bundle();
                 bundle.putInt("project_id",project_id);
                 bundle.putInt("actionid",1);
+                bundle.putInt("commissioned_id",projectEntity.getBUSINESS().getCOMMISSIONED_ID());
                 startActivity(AddNoteActivity.class,bundle);
                 break;
             case R.id.add_note_btn_apply:
@@ -567,7 +569,7 @@ public class ProjectDetailActivity extends BaseActivity {
         }
     }
 
-    private void modifyProjectStatus(String statusVal){
+    private void modifyProjectStatus(final String statusVal){
         RequestParam requestParam=new RequestParam();
         requestParam.setUrl(BASE_URL+"/api/project/ModifyProjectStatus");
         requestParam.setMethod(HttpMethod.Post);
@@ -580,6 +582,53 @@ public class ProjectDetailActivity extends BaseActivity {
             public void onSuccess(String result) {
                 super.onSuccess(result);
                 LogUtils.d("result",result);
+                try {
+                    JSONObject jsonobj = new JSONObject(result);
+                    if(jsonobj.getBoolean("Status")){
+                        LogUtil.d("暂停项目"+jsonobj.toString());
+                        //EventBus.getDefault().post(new EventBusMessage<>("AddNote"));
+                        //AddNoteActivity.this.finish();
+                        //finish();
+                        modifyProjectStatusToOA(statusVal);
+                    }else{
+                        showToast(jsonobj.getString("Message"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                super.onError(ex, isOnCallback);
+                showToast(ex.getMessage());
+            }
+
+            @Override
+            public void onFinished() {
+                super.onFinished();
+                stopProgressDialog();
+            }
+        });
+        sendRequest(requestParam,true);
+    }
+
+    private void modifyProjectStatusToOA(String statusVal){
+        RequestParam requestParam=new RequestParam();
+        requestParam.setUrl(OA_BASE_URL+"/project/BankUpdateProjectStatus");
+        requestParam.setMethod(HttpMethod.Post);
+        Map<String,Object> requestMap=new HashMap<>();
+        requestMap.put("PROJECT_ID",project_id);
+        requestMap.put("project_status",statusVal);
+        requestMap.put("COMMISSIONED_ID",projectEntity.getBUSINESS().getCOMMISSIONED_ID());
+        requestParam.setPostRequestMap(requestMap);
+        requestParam.setCallback(new MyCallBack<String>(){
+            @Override
+            public void onSuccess(String result) {
+                super.onSuccess(result);
+                LogUtils.d("result",result);
+                //BaseEntity<Integer> entity= JsonParse.parse(result,Integer.class);
                 try {
                     JSONObject jsonobj = new JSONObject(result);
                     if(jsonobj.getBoolean("Status")){
