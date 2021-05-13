@@ -553,11 +553,13 @@ public class ProjectDetailActivity extends BaseActivity {
             Bundle bundle=new Bundle();
             bundle.putInt("project_id",project_id);
             bundle.putInt("actionid",2);
+            bundle.putInt("commissioned_id",projectEntity.getBUSINESS().getCOMMISSIONED_ID());
             startActivity(AddNoteActivity.class,bundle);
         }else if (action == 3){
             Bundle bundle=new Bundle();
             bundle.putInt("project_id",project_id);
             bundle.putInt("actionid",3);
+            bundle.putInt("commissioned_id",projectEntity.getBUSINESS().getCOMMISSIONED_ID());
             startActivity(AddNoteActivity.class,bundle);
         }else if (action == 4){
             modifyProjectStatus("40001001");

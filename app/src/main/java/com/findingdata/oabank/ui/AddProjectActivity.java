@@ -56,7 +56,7 @@ import static com.findingdata.oabank.base.Config.OA_DYNAMIC_ID;
 public class AddProjectActivity extends BaseActivity {
 
     @ViewInject(R.id.project_content)
-    private LinearLayout _project_content; 
+    private LinearLayout _project_content;
     private TextView add_object;
     private TextView submit;
     private EditText loan_money;

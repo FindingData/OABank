@@ -1,8 +1,11 @@
 package com.findingdata.oabank.ui;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import static com.findingdata.oabank.base.BaseHandler.CHECK_LOGIN;
 
@@ -38,13 +42,35 @@ public class LaunchActivity extends BaseActivity {
     private TextView tv_loading_version;
 
     private ProgressDialog progressDialog;
+    private boolean hasPermission = false;
+    public static final int REQUEST_CODE_SOME_FEATURES_PERMISSIONS = 1;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setFullScreen(false);
         super.onCreate(savedInstanceState);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            checkPermission();
+        }else{
+            hasPermission=true;
+        }
         tv_loading_version.setText("v-"+ Utils.getCurrentVersion(this)+" : "+Utils.getCurrentBuild(this));
         checkVersion();
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void checkPermission() {
+        int hasReadSDPermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+        List<String> permissions = new ArrayList<>();
+        if (hasReadSDPermission != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        } else {
+            hasPermission = true;
+        }
+        if (!permissions.isEmpty()) {
+            requestPermissions(permissions.toArray(new String[permissions.size()]), REQUEST_CODE_SOME_FEATURES_PERMISSIONS);
+        }
+    }
+
 
     /**
      * 检查版本

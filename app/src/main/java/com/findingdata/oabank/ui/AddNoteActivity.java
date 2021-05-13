@@ -161,7 +161,7 @@ public class AddNoteActivity extends BaseActivity {
 
     private void addNoteToOA(){
         RequestParam requestParam=new RequestParam();
-        requestParam.setUrl(OA_BASE_URL+"/project/BankProejctNote");
+        requestParam.setUrl(OA_BASE_URL+"/project/BankProjectNote");
         requestParam.setMethod(HttpMethod.Post);
         Map<String,Object> requestMap=new HashMap<>();
         requestMap.put("PROJECT_ID",project_id);

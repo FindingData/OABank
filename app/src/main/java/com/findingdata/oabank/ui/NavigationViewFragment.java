@@ -75,11 +75,11 @@ public class NavigationViewFragment extends BaseFragment {
     //加载配置的查询条件
     private void getQueryData(){
         RequestParam requestParam=new RequestParam();
-        requestParam.setUrl(BASE_URL+"/api/Project/GetQueryItems");
+        requestParam.setUrl(BASE_URL+"/api/project/GetQueryItems?RESOURCEID=011005");
         requestParam.setMethod(HttpMethod.Get);
         Map<String,String> map=new HashMap<>();
-        map.put("RESOURCEID", "011005");
-        requestParam.setGetRequestMap(map);
+//        map.put("RESOURCEID", "011005");
+//        requestParam.setGetRequestMap(map);
         requestParam.setCallback(new MyCallBack<String>(){
             @Override
             public void onSuccess(String result) {
