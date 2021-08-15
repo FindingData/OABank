@@ -54,7 +54,7 @@ public class LaunchActivity extends BaseActivity {
             hasPermission=true;
         }
         tv_loading_version.setText("v-"+ Utils.getCurrentVersion(this)+" : "+Utils.getCurrentBuild(this));
-        checkVersion();
+        checkVersion();   
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
