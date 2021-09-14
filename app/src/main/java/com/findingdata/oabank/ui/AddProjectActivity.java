@@ -210,27 +210,31 @@ public class AddProjectActivity extends BaseActivity {
                         jsonarray.add(jsonobj);
 
                         for (int i = 0; i<formContentValue.length(); i++){
-                            if (!formContents.getJSONObject(i).getString("BINDEXPANDFIELD").equals("") && formContents.getJSONObject(i).getString("BINDEXPANDFIELD") != null){
-                                jsonobj = new FormLabelData();
-                                jsonobj.setKey(formContents.getJSONObject(i).getString("BINDEXPANDFIELD"));
-                                if (i == 0) {
-                                    jsonobj.setValue( project_type);
-                                } else if (i == 1) {
-                                    jsonobj.setValue( loan_type);
-                                } else if (i == 2) {
-                                    jsonobj.setValue( loan_money.getText().toString());
-                                } else if (i == 3) {
-                                    jsonobj.setValue( jiekuanren.getText().toString());
-                                } else if (i == 4) {
-                                    jsonobj.setValue( jiekuanrendianhua.getText().toString());
-                                } else if (i == 5) {
-                                    jsonobj.setValue( weituoren.getText().toString());
-                                } else if (i == 6) {
-                                    jsonobj.setValue( weituorendianhua.getText().toString());
-                                }else if (i == 7) {
-                                    jsonobj.setValue( SharedPreferencesManage.getUserInfo().getUserId()+"");
+                            if (!formContents.getJSONObject(i).getString("BINDEXPANDFIELD").equals("") && formContents.getJSONObject(i).getString("BINDEXPANDFIELD") != null &&!formContents.getJSONObject(i).getString("BINDEXPANDFIELD").equals("null")){
+
+                                if (!formContents.getJSONObject(i).getString("IS_CLIENT").equals("0")){
+                                    jsonobj = new FormLabelData();
+                                    jsonobj.setKey(formContents.getJSONObject(i).getString("BINDEXPANDFIELD"));
+                                    if (i == 0) {
+                                        jsonobj.setValue( project_type);
+                                    } else if (i == 1) {
+                                        jsonobj.setValue( loan_type);
+                                    } else if (i == 2) {
+                                        jsonobj.setValue( loan_money.getText().toString());
+                                    } else if (i == 3) {
+                                        jsonobj.setValue( jiekuanren.getText().toString());
+                                    } else if (i == 4) {
+                                        jsonobj.setValue( jiekuanrendianhua.getText().toString());
+                                    } else if (i == 5) {
+                                        jsonobj.setValue( weituoren.getText().toString());
+                                    } else if (i == 6) {
+                                        jsonobj.setValue( weituorendianhua.getText().toString());
+                                    }else if (i == 7) {
+                                        jsonobj.setValue( SharedPreferencesManage.getUserInfo().getUserId()+"");
+                                    }
+                                    jsonarray.add(jsonobj);
                                 }
-                                jsonarray.add(jsonobj);
+
                             }
                         }
                         saveProject(jsonarray);
